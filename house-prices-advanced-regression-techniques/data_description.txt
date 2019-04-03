@@ -1,0 +1,574 @@
+MSSubClass: Identifies the type of dwelling involved in the sale.	
+
+        20	1-STORY 1946 & NEWER ALL STYLES
+        30	1-STORY 1945 & OLDER
+        40	1-STORY W/FINISHED ATTIC ALL AGES
+        45	1-1/2 STORY - UNFINISHED ALL AGES
+        50	1-1/2 STORY FINISHED ALL AGES
+        60	2-STORY 1946 & NEWER
+        70	2-STORY 1945 & OLDER
+        75	2-1/2 STORY ALL AGES
+        80	SPLIT OR MULTI-LEVEL
+        85	SPLIT FOYER
+        90	DUPLEX - ALL STYLES AND AGES
+       120	1-STORY PUD (Planned Unit Development) - 1946 & NEWER
+       150	1-1/2 STORY PUD - ALL AGES
+       160	2-STORY PUD - 1946 & NEWER
+       180	PUD - MULTILEVEL - INCL SPLIT LEV/FOYER
+       190	2 FAMILY CONVERSION - ALL STYLES AND AGES
+
+MSZoning: Identifies the general zoning classification of the sale.
+		
+       A	Agriculture
+       C	Commercial (10)
+       FV	Floating Village Residential (65)
+       I	Industrial
+       RH	Residential High Density (16)
+       RL	Residential Low Density  (1151)
+       RP	Residential Low Density Park 
+       RM	Residential Medium Density (218)
+       Note: Nominal feature. Encode to 1-8 or use OneHot. There are no A, I nor RP in the training data.
+	
+LotFrontage: Linear feet of street connected to property
+
+LotArea: Lot size in square feet
+
+Street: Type of road access to property
+
+       Grvl	Gravel	 (1454)
+       Pave	Paved    (6)
+       Note : Nominal feature. Encode to 1-2. Even though Gravel represents 99% of the feature.
+       	
+Alley: Type of alley access to property
+
+       Grvl	Gravel (50)
+       Pave	Paved (41)
+       NA 	No alley access (1369)
+       Note : Nominal feature. 0 -> No alley. 1 -> Gravel. 2 -> Paved
+		
+LotShape: General shape of property
+
+       Reg	Regular	 (925)
+       IR1	Slightly irregular (484)
+       IR2	Moderately Irregular (41)
+       IR3	Irregular (10)
+       Note: Ordinal feature. Encode to 0-3. 0 means no irregularity, 3 means irregular.
+       
+LandContour: Flatness of the property
+
+       Lvl	Near Flat/Level	 (1311)
+       Bnk	Banked - Quick and significant rise from street grade to building (63)
+       HLS	Hillside - Significant slope from side to side (50)
+       Low	Depression (36)
+       Note: Ordinal feature. Encode to 0-3. 0 means flat, 3 means depression.
+		
+Utilities: Type of utilities available
+		
+       AllPub	All public Utilities (E,G,W,& S)	(1459)
+       NoSewr	Electricity, Gas, and Water (Septic Tank)
+       NoSeWa	Electricity and Gas Only (1)
+       ELO	Electricity only
+       Note: Ordinal feature. Encode 0-3. 0 means only electricity, 3 means all utilities
+       Training data does not contain any NoSewr nor ELO. AllPub represents almost 100%
+       of the feature.
+
+	
+LotConfig: Lot configuration
+
+       Inside	Inside lot (1052)
+       Corner	Corner lot (263)
+       CulDSac	Cul-de-sac (94)
+       FR2	Frontage on 2 sides of property (47)
+       FR3	Frontage on 3 sides of property (4)
+	   Note: Nominal feature. Encode to 0-4.
+LandSlope: Slope of property
+		
+       Gtl	Gentle slope (1382)
+       Mod	Moderate Slope (65)
+       Sev	Severe Slope (13)
+       Note: Ordinal feature. Encode to 0-2. 0 mean gentle slope, 1 moderate, 2 severe
+	
+Neighborhood: Physical locations within Ames city limits
+
+       Blmngtn	Bloomington Heights (17)
+       Blueste	Bluestem (2)
+       BrDale	Briardale (16)
+       BrkSide	Brookside (58)
+       ClearCr	Clear Creek (28)
+       CollgCr	College Creek
+       Crawfor	Crawford (51)
+       Edwards	Edwards (100)
+       Gilbert	Gilbert (79)
+       IDOTRR	Iowa DOT and Rail Road (37)
+       MeadowV	Meadow Village (17)
+       Mitchel	Mitchell (49)
+       Names	North Ames
+       NoRidge	Northridge (41)
+       NPkVill	Northpark Villa
+       NridgHt	Northridge Heights (77)
+       NWAmes	Northwest Ames (73)
+       OldTown	Old Town (113)
+       SWISU	South & West of Iowa State University (25)
+       Sawyer	Sawyer (74)
+       SawyerW	Sawyer West (59)
+       Somerst	Somerset (86)
+       StoneBr	Stone Brook (25)
+       Timber	Timberland (38)
+       Veenker	Veenker (11)
+       Note: Nominal Feature. Encode using OneHot. CollgCr, Names have no instances.
+			
+Condition1: Proximity to various conditions
+	
+       Artery	Adjacent to arterial street (48)
+       Feedr	Adjacent to feeder street	(81)
+       Norm	Normal	(1260)
+       RRNn	Within 200' of North-South Railroad (5)
+       RRAn	Adjacent to North-South Railroad (26)
+       PosN	Near positive off-site feature--park, greenbelt, etc. (19)
+       PosA	Adjacent to postive off-site feature (8)
+       RRNe	Within 200' of East-West Railroad (2)
+       RRAe	Adjacent to East-West Railroad (11)
+       Note: Nominal feature. Encode using OneHot. TODO
+	
+Condition2: Proximity to various conditions (if more than one is present)
+		
+       Artery	Adjacent to arterial street
+       Feedr	Adjacent to feeder street	
+       Norm	Normal	(1445)
+       RRNn	Within 200' of North-South Railroad
+       RRAn	Adjacent to North-South Railroad
+       PosN	Near positive off-site feature--park, greenbelt, etc.
+       PosA	Adjacent to postive off-site feature
+       RRNe	Within 200' of East-West Railroad
+       RRAe	Adjacent to East-West Railroad
+       Note: Nominal feature. Encode using OneHot. Normal represents 99%+ of the feature.
+	
+BldgType: Type of dwelling
+		
+       1Fam	Single-family Detached	(1220)
+       2FmCon	Two-family Conversion; originally built as one-family dwelling (31)
+       Duplx	Duplex (52)
+       TwnhsE	Townhouse End Unit (114)
+       TwnhsI	Townhouse Inside Unit
+       Note: Nominal feature.Encode using OneHot or 0-4.
+	
+HouseStyle: Style of dwelling
+	
+       1Story	One story (726)
+       1.5Fin	One and one-half story: 2nd level finished (154)
+       1.5Unf	One and one-half story: 2nd level unfinished (14)
+       2Story	Two story (445)
+       2.5Fin	Two and one-half story: 2nd level finished (8)
+       2.5Unf	Two and one-half story: 2nd level unfinished (11)
+       SFoyer	Split Foyer (37)
+       SLvl	Split Level (65)
+       Note: Nominal Feature. Encode using OneHot. TODO
+	
+OverallQual: Rates the overall material and finish of the house
+
+       10	Very Excellent
+       9	Excellent
+       8	Very Good
+       7	Good
+       6	Above Average
+       5	Average
+       4	Below Average
+       3	Fair
+       2	Poor
+       1	Very Poor
+	
+OverallCond: Rates the overall condition of the house
+
+       10	Very Excellent
+       9	Excellent
+       8	Very Good
+       7	Good
+       6	Above Average	
+       5	Average
+       4	Below Average	
+       3	Fair
+       2	Poor
+       1	Very Poor
+		
+YearBuilt: Original construction date
+
+YearRemodAdd: Remodel date (same as construction date if no remodeling or additions)
+
+RoofStyle: Type of roof
+
+       Flat	Flat (13)
+       Gable	Gable (1141)
+       Gambrel	Gabrel (Barn) (11)
+       Hip	Hip (286)
+       Mansard	Mansard (7)
+       Shed	Shed (2)
+       Note: Nominal Feature. Encode using OneHot or 0-5
+		
+RoofMatl: Roof material
+
+       ClyTile	Clay or Tile (1)
+       CompShg	Standard (Composite) Shingle (1434)
+       Membran	Membrane (1)
+       Metal	Metal (1)
+       Roll	Roll (1)
+       Tar&Grv	Gravel & Tar (11)
+       WdShake	Wood Shakes (5)
+       WdShngl	Wood Shingles (6)
+       Note: Nominal feature. Encode using OneHot or 0-7. CompShg represents 99% of the feature.
+		
+Exterior1st: Exterior covering on house
+
+       AsbShng	Asbestos Shingles
+       AsphShn	Asphalt Shingles
+       BrkComm	Brick Common
+       BrkFace	Brick Face
+       CBlock	Cinder Block
+       CemntBd	Cement Board
+       HdBoard	Hard Board
+       ImStucc	Imitation Stucco
+       MetalSd	Metal Siding
+       Other	Other
+       Plywood	Plywood
+       PreCast	PreCast	
+       Stone	Stone
+       Stucco	Stucco
+       VinylSd	Vinyl Siding
+       Wd Sdng	Wood Siding
+       WdShing	Wood Shingles
+       Note: Nominal Feature. Encode using OneHot.
+Exterior2nd: Exterior covering on house (if more than one material)
+
+       AsbShng	Asbestos Shingles
+       AsphShn	Asphalt Shingles
+       BrkComm	Brick Common
+       BrkFace	Brick Face
+       CBlock	Cinder Block
+       CemntBd	Cement Board
+       HdBoard	Hard Board
+       ImStucc	Imitation Stucco
+       MetalSd	Metal Siding
+       Other	Other
+       Plywood	Plywood
+       PreCast	PreCast
+       Stone	Stone
+       Stucco	Stucco
+       VinylSd	Vinyl Siding
+       Wd Sdng	Wood Siding
+       WdShing	Wood Shingles
+       Note: Nominal feature. Encode using OneHot.
+	
+MasVnrType: Masonry veneer type
+
+       BrkCmn	Brick Common
+       BrkFace	Brick Face (445)
+       CBlock	Cinder Block
+       None	None (864)
+       Stone	Stone
+       Nominal Feature: Encode using 0-4. 0 means None.
+       There are 8 NaN that means anomaly.
+	
+MasVnrArea: Masonry veneer area in square feet
+
+ExterQual: Evaluates the quality of the material on the exterior 
+		
+       Ex	Excellent
+       Gd	Good
+       TA	Average/Typical
+       Fa	Fair
+       Po	Poor
+	   Note: Ordinal feature. Encode to 0-4. 0 means Poor, 4 means Excellent.
+ExterCond: Evaluates the present condition of the material on the exterior
+		
+       Ex	Excellent
+       Gd	Good
+       TA	Average/Typical
+       Fa	Fair
+       Po	Poor
+	   Note: Ordinal feature. Encode to 0-4. 0 means Poor, 4 means Excellent.
+
+Foundation: Type of foundation
+		
+       BrkTil	Brick & Tile
+       CBlock	Cinder Block
+       PConc	Poured Contrete	
+       Slab	Slab
+       Stone	Stone
+       Wood	Wood
+       Note: Nominal feature. Encode to 0-5 or OneHot.
+		
+BsmtQual: Evaluates the height of the basement
+
+       Ex	Excellent (100+ inches)	
+       Gd	Good (90-99 inches)
+       TA	Typical (80-89 inches)
+       Fa	Fair (70-79 inches)
+       Po	Poor (<70 inches
+       NA	No Basement (37)
+       Note: Ordinal feature. Encode to 0-6. 0 means No Basement, 6 means Excellent.
+       There are no Poor in the training data.
+		
+BsmtCond: Evaluates the general condition of the basement
+
+       Ex	Excellent
+       Gd	Good
+       TA	Typical - slight dampness allowed
+       Fa	Fair - dampness or some cracking or settling
+       Po	Poor - Severe cracking, settling, or wetness
+       NA	No Basement
+       Note: Ordinal feature. Encode to 0-6. There are no Ex nor NA in the training data.
+	
+BsmtExposure: Refers to walkout or garden level walls
+
+       Gd	Good Exposure
+       Av	Average Exposure (split levels or foyers typically score average or above)	
+       Mn	Mimimum Exposure
+       No	No Exposure
+       NA	No Basement (38)
+       Note: Ordinal feature. Encode to 0-4. 0 means No Basement, 4 means Good Exposure.
+
+BsmtFinType1: Rating of basement finished area
+
+       GLQ	Good Living Quarters
+       ALQ	Average Living Quarters
+       BLQ	Below Average Living Quarters	
+       Rec	Average Rec Room
+       LwQ	Low Quality
+       Unf	Unfinshed
+       NA	No Basement (37)
+       Note: Ordinal feature. Encode to 0-6. 0 means no Basement, 6 means GLQ.
+
+BsmtFinSF1: Type 1 finished square feet
+
+BsmtFinType2: Rating of basement finished area (if multiple types)
+
+       GLQ	Good Living Quarters
+       ALQ	Average Living Quarters
+       BLQ	Below Average Living Quarters	
+       Rec	Average Rec Room
+       LwQ	Low Quality
+       Unf	Unfinshed
+       NA	No Basement (38)
+       Note: Ordinal feature. Encode to 0-6. 0 means no Basement, 6 means GLQ.
+
+BsmtFinSF2: Type 2 finished square feet
+
+BsmtUnfSF: Unfinished square feet of basement area
+
+TotalBsmtSF: Total square feet of basement area
+
+Heating: Type of heating
+		
+       Floor	Floor Furnace
+       GasA	Gas forced warm air furnace
+       GasW	Gas hot water or steam heat
+       Grav	Gravity furnace	
+       OthW	Hot water or steam heat other than gas
+       Wall	Wall furnace
+       Note: Nominal feature. Encode to 0-5. GasA represents 99% of the feature.
+		
+HeatingQC: Heating quality and condition
+
+       Ex	Excellent
+       Gd	Good
+       TA	Average/Typical
+       Fa	Fair
+       Po	Poor
+       Note: Ordinal feature. Encode to 0-4. 0 means Poor, 4 means Excellent.
+		
+CentralAir: Central air conditioning
+
+       N	No
+       Y	Yes
+       Note: Ordinal feature. 0-1. 0 means no, 1 means yes.
+       Yes represents 95%+ of the feature
+		
+Electrical: Electrical system
+
+       SBrkr	Standard Circuit Breakers & Romex
+       FuseA	Fuse Box over 60 AMP and all Romex wiring (Average)	
+       FuseF	60 AMP Fuse Box and mostly Romex wiring (Fair)
+       FuseP	60 AMP Fuse Box and mostly knob & tube wiring (poor)
+       Mix	Mixed
+       Note: Nominal feature. Could be Ordinal. SBrkr represents 98% of the feature.
+		
+1stFlrSF: First Floor square feet
+ 
+2ndFlrSF: Second floor square feet
+
+LowQualFinSF: Low quality finished square feet (all floors)
+
+GrLivArea: Above grade (ground) living area square feet
+
+BsmtFullBath: Basement full bathrooms
+
+BsmtHalfBath: Basement half bathrooms
+
+FullBath: Full bathrooms above grade
+
+HalfBath: Half baths above grade
+
+Bedroom: Bedrooms above grade (does NOT include basement bedrooms)
+
+Kitchen: Kitchens above grade
+
+KitchenQual: Kitchen quality
+
+       Ex	Excellent
+       Gd	Good
+       TA	Typical/Average
+       Fa	Fair
+       Po	Poor
+       Note: Ordinal feature. Encode to 0-4. 0 means Poor, 4 means Excellent.
+       	
+TotRmsAbvGrd: Total rooms above grade (does not include bathrooms)
+
+Functional: Home functionality (Assume typical unless deductions are warranted)
+
+       Typ	Typical Functionality
+       Min1	Minor Deductions 1
+       Min2	Minor Deductions 2
+       Mod	Moderate Deductions
+       Maj1	Major Deductions 1
+       Maj2	Major Deductions 2
+       Sev	Severely Damaged
+       Sal	Salvage only
+	   Note: Ordinal feature. Encode to 0-7. 0 means Salvage only, 7 means Typical.
+	   Typ represents 99% of the feature.
+Fireplaces: Number of fireplaces
+
+FireplaceQu: Fireplace quality
+
+       Ex	Excellent - Exceptional Masonry Fireplace
+       Gd	Good - Masonry Fireplace in main level
+       TA	Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement
+       Fa	Fair - Prefabricated Fireplace in basement
+       Po	Poor - Ben Franklin Stove
+       NA	No Fireplace
+       Note: Ordinal feature. Encode to 0-5. 0 means NA, 5 Ex.
+		
+GarageType: Garage location
+		
+       2Types	More than one type of garage
+       Attchd	Attached to home
+       Basment	Basement Garage
+       BuiltIn	Built-In (Garage part of house - typically has room above garage)
+       CarPort	Car Port
+       Detchd	Detached from home
+       NA	No Garage
+       Note: Nominal feature. Encode using OneHot.
+       Attchd and Detchd represents the feature.
+		
+GarageYrBlt: Year garage was built
+		
+GarageFinish: Interior finish of the garage
+
+       Fin	Finished (352)
+       RFn	Rough Finished	(422)
+       Unf	Unfinished
+       NA	No Garage (81)
+	   Note: Ordinal feature. Encode to 0-3. 0 means NA, 3 means Fin.
+GarageCars: Size of garage in car capacity
+
+GarageArea: Size of garage in square feet
+
+GarageQual: Garage quality
+
+       Ex	Excellent
+       Gd	Good
+       TA	Typical/Average
+       Fa	Fair
+       Po	Poor
+       NA	No Garage (81)
+       Note: Ordinal feature. Encode to 0-5. 0 means NA, 5 means Ex.
+	   Highly related to GarageFinish.
+GarageCond: Garage condition
+
+       Ex	Excellent
+       Gd	Good
+       TA	Typical/Average
+       Fa	Fair
+       Po	Poor
+       NA	No Garage (81)
+       Note: Ordinal feature. Encode to 0-5. 0 means NA, 5 means Ex.
+       TA represents 99% of the feature.
+	   Highly related to GarageFinish/Qual.
+
+PavedDrive: Paved driveway
+
+       Y	Paved 
+       P	Partial Pavement
+       N	Dirt/Gravel
+	   Note: Nominal feature. Encode to 0-2. Paved represents 99% of the feature.
+WoodDeckSF: Wood deck area in square feet
+
+OpenPorchSF: Open porch area in square feet
+
+EnclosedPorch: Enclosed porch area in square feet
+
+3SsnPorch: Three season porch area in square feet
+
+ScreenPorch: Screen porch area in square feet
+
+PoolArea: Pool area in square feet
+
+PoolQC: Pool quality
+		
+       Ex	Excellent
+       Gd	Good
+       TA	Average/Typical
+       Fa	Fair
+       NA	No Pool
+       Note: Ordinal feature. Encode to 0-4. 0 means No Pool, 4 Ex.
+       There are no TA nor NA in the training data.
+		
+Fence: Fence quality
+		
+       GdPrv	Good Privacy
+       MnPrv	Minimum Privacy
+       GdWo	Good Wood
+       MnWw	Minimum Wood/Wire
+       NA	No Fence
+       Note: Nominal feature. Could be ordinal.
+       Encode using OneHot or 0-5.
+	
+MiscFeature: Miscellaneous feature not covered in other categories
+		
+       Elev	Elevator
+       Gar2	2nd Garage (if not described in garage section)
+       Othr	Other
+       Shed	Shed (over 100 SF)
+       TenC	Tennis Court
+       NA	None
+       Note: Nominal feature. Encode using 0-5 or OneHot.
+       Shed represents 99% of the data.
+		
+MiscVal: $Value of miscellaneous feature
+
+MoSold: Month Sold (MM)
+
+YrSold: Year Sold (YYYY)
+
+SaleType: Type of sale
+		
+       WD 	Warranty Deed - Conventional
+       CWD	Warranty Deed - Cash
+       VWD	Warranty Deed - VA Loan
+       New	Home just constructed and sold
+       COD	Court Officer Deed/Estate
+       Con	Contract 15% Down payment regular terms
+       ConLw	Contract Low Down payment and low interest
+       ConLI	Contract Low Interest
+       ConLD	Contract Low Down
+       Oth	Other
+       Note: Nominal Feature. Could be Ordinal. Encode using OneHot.
+       WD represents 98% of the feature.
+		
+SaleCondition: Condition of sale
+
+       Normal	Normal Sale
+       Abnorml	Abnormal Sale -  trade, foreclosure, short sale
+       AdjLand	Adjoining Land Purchase
+       Alloca	Allocation - two linked properties with separate deeds, typically condo with a garage unit	
+       Family	Sale between family members
+       Partial	Home was not completed when last assessed (associated with New Homes)
+       Note: Nominal feature. Normal represents 98% of the feature.

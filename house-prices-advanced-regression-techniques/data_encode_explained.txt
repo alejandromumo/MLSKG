@@ -1,0 +1,7 @@
+Binary encoding
+Feature Street
+{'Pave': 0, 'Grvl': 1}
+Feature Utilities
+{'AllPub': 0, 'NoSeWa': 1}
+Feature CentralAir
+{'N': 1, 'Y': 0}
