@@ -1,10 +1,10 @@
 from joblib import load
 from pandas import read_csv, DataFrame, concat
-from sklearn.metrics import accuracy_score
 
 
 def test_model(filename, output_file_name):
     model = load(filename)
+    print(model)
     predictions = DataFrame(model.predict(X_test), columns=["target"])
     balance = predictions["target"].value_counts()
     print("Predictions balance : ")
@@ -73,10 +73,18 @@ elif quadratic:
     model_file_name = "qda_model.joblib"
     submission_output_file_name = "qda_model_submission.csv"
 elif svm:
-    model_file_name = "svm_linear_model.joblib"
-    submission_output_file_name = "svm_linear_model_submission.csv"
+    model_file_name = "svm_rbf_model.joblib"
+    submission_output_file_name = "svm_rbf_model_submission.csv"
 # Test the model
 test_model(model_file_name, submission_output_file_name)
 
+
+# SVC(C=0.03125, cache_size=200, class_weight={0: 20098, 1: 179902}, coef0=0.0,
+#     decision_function_shape='ovr', degree=3, gamma=0.0001220703125,
+#     kernel='rbf', max_iter=-1, probability=False, random_state=None,
+#     shrinking=True, tol=0.001, verbose=False)
+# Predictions balance :
+# 1.0    199804
+# 0.0       196
 
 

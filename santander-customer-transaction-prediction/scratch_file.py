@@ -3,9 +3,13 @@ from numpy import linalg as LA
 import numpy as np
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LogisticRegression
+import seaborn as sns
+import timeit
+import matplotlib.pyplot as plt
 import os
 import psutil
 import platform
+from pandas.plotting import scatter_matrix
 
 
 def print_mem_usage(tab=""):
@@ -29,9 +33,16 @@ def weighted_mean_absolute_error(y_true, y_pred, weights):
     return J
 
 
+def plot_corr(df):
+    scatter_matrix(df, grid=True)
+
+
 # Process
 process = psutil.Process(os.getpid())
-print(platform.architecture())
+architecture = platform.architecture()
+print(architecture)
+if architecture[0] != '64bit':
+    raise Warning("It is recommended to use the 64-bit version of python's interpreter due to memory constraints")
 
 # Load train data set and analyze it
 # Force data types to optimize memory usage
@@ -97,11 +108,40 @@ kf = KFold(n_splits=k, shuffle=False)
 kf2 = KFold(n_splits=k2)
 X = train_data.iloc[:,2:]
 y = train_data["target"]
+
+# Perform data analysis of the features (X)
+# Covariance  : The sign of the covariance therefore shows the tendency in the linear relationship between the variables
+# Correlation : Covariance normalized
+data_analysis = True
+covariance = False
+correlation = not covariance
+if data_analysis:
+    print("Performing data analysis")
+    if correlation:
+        pass
+        # corr = train_data.corr()
+        # sns.heatmap(corr,
+        #             xticklabels=corr.columns.values,
+        #             yticklabels=corr.columns.values)
+        # plt.show()
+    else:
+        c = train_data.cov()
+    histograms = []
+    n_bins = 10
+    for i in range(20):
+        data = X.iloc[:, i*10:i*10 + 10]
+        plt.figure(i, figsize=(20, 20))
+        fig, ax = plt.subplots(nrows=2, ncols=5)
+        plt.hist(data, bins=n_bins)
+    plt.show()
+    exit(0)
+
 class_weight = {0:0.10049, 1:0.89951}
 print_mem_usage()
 i = 1
 score_matrix = []
 scores = []
+
 # Try different alphas
 for alpha in [(1/10)**x for x in range(0,10)]:
     tab = 0
