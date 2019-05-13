@@ -1,6 +1,7 @@
 from joblib import load
 from pandas import read_csv, DataFrame, concat
 
+# TODO scale data
 
 def test_model(filename, output_file_name):
     model = load(filename)

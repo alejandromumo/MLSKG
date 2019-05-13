@@ -19,6 +19,7 @@ __pycache__/
 # Folder
 /plots
 /ML-64
+/MLvenv
 
 # Images
 *.png

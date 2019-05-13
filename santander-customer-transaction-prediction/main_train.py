@@ -160,8 +160,8 @@ d = {'ID_code' : 'object', 'target' : 'int32', 'var_0' : 'float32',
      'var_186' : 'float32', 'var_187' : 'float32', 'var_188' : 'float32', 'var_189' : 'float32', 'var_190' : 'float32',
      'var_191' : 'float32', 'var_192' : 'float32', 'var_193' : 'float32', 'var_194' : 'float32', 'var_195' : 'float32',
      'var_196' : 'float32', 'var_197' : 'float32', 'var_198' : 'float32', 'var_199' : 'float32'}
-file_name = "scaled_data.csv"
-train_data = pd.read_csv("C:/Users/mumox/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/scaled_data.csv",
+file_name = "scaled_data.csv" # TODO save scaler from train to use in test. Linear > std
+train_data = pd.read_csv("C:/Users/ManuelCosta/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/scaled_data.csv",
                          dtype=d, lineterminator='\n')
 train_data = train_data.iloc[:, 1:].values
 # train_data = np.loadtxt(file_name, delimiter=',')
@@ -173,9 +173,9 @@ target_count.append(train_data[train_data[:,0]==1, :].shape[0])
 print('Class 0:', target_count[0])
 print('Class 1:', target_count[1])
 print('Proportion:', round(target_count[0] / target_count[1], 2), ': 1')
-class_weight = {0: target_count[1], 1: target_count[0]}
-# Class 0: 179902  (Positive)
-# Class 1: 20098   (Negative)
+class_weight = {0: target_count[1], 1: target_count[0]} # TODO
+# Class 0: 179902  (Negative)
+# Class 1: 20098   (Positive)
 # Proportion: 8.95 : 1
 
 # Setup K-cross validation
@@ -185,7 +185,7 @@ kf = KFold(n_splits=k, shuffle=False)
 # Perform sub-sampling
 if sub_sampling:
     if cv:
-        sample_size = 0.015
+        sample_size = 0.015  # TODO increase
     else:
         sample_size = 0.5
     target_count_0 = int((sample_size * target_count[0]))
