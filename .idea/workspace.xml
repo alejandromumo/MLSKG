@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c8640af4-97fb-4826-a00a-3c132728b8dc" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/MLSKG.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MLSKG.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_encode_explained.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py" afterDir="false" />
     </list>
@@ -25,35 +25,42 @@
     <SUITE FILE_PATH="coverage/MLSKG$Classification.coverage" NAME="Classification Coverage Results" MODIFIED="1553965690856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
     <SUITE FILE_PATH="coverage/MLSKG$main_test.coverage" NAME="main_test Coverage Results" MODIFIED="1555168783788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="162" column="24" selection-start-line="162" selection-start-column="24" selection-end-line="162" selection-end-column="24" />
+            <state relative-caret-position="402">
+              <caret line="162" column="52" lean-forward="true" selection-start-line="162" selection-start-column="52" selection-end-line="162" selection-end-column="52" />
               <folding>
-                <element signature="e#15#34#0" expanded="true" />
-                <marker date="1557752090592" expanded="true" signature="1099:1413" ph="..." />
+                <element signature="e#0#35#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/requirements.txt">
+        <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/multivariate_analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="114">
-              <caret line="6" column="13" lean-forward="true" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="399">
-              <caret line="21" column="7" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
+            <state relative-caret-position="551">
+              <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
+              <folding>
+                <element signature="e#133#152#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -61,31 +68,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="57">
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
+            <state relative-caret-position="171">
+              <caret line="10" column="70" selection-start-line="10" selection-start-column="70" selection-end-line="10" selection-end-column="70" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/test.csv">
-          <provider selected="true" editor-type-id="LargeFileEditor">
-            <state relative-caret-position="19">
-              <caret line="1" column="768" lean-forward="true" selection-start-line="1" selection-start-column="768" selection-end-line="1" selection-end-column="768" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/scratch_file.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2337">
-              <caret line="134" column="35" selection-start-line="134" selection-start-column="35" selection-end-line="134" selection-end-column="35" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -102,10 +88,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Street</find>
-      <find>LotS</find>
-      <find>Land</find>
-      <find>BsmtEx</find>
       <find>no NA</find>
       <find>garageF</find>
       <find>ALley</find>
@@ -132,6 +114,10 @@
       <find>read_csv</find>
       <find>\</find>
       <find>scal</find>
+      <find>mn</find>
+      <find>overal</find>
+      <find>check</find>
+      <find>Scaler</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -142,7 +128,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_description.txt" />
-        <option value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch.py" />
         <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/norm_pca.csv" />
         <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/original_pca.csv" />
@@ -150,15 +135,19 @@
         <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/main.py" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_santander.py" />
         <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/scratch_file.py" />
-        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py" />
-        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/svm_parameters.py" />
+        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py" />
+        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/submission.csv" />
+        <option value="$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py" />
+        <option value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/multivariate_analysis.py" />
+        <option value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
-    <option name="x" value="10" />
-    <option name="y" value="20" />
+    <option name="x" value="230" />
+    <option name="y" value="155" />
     <option name="width" value="1350" />
     <option name="height" value="700" />
   </component>
@@ -166,32 +155,24 @@
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="MLSKG" type="b2602c69:ProjectViewProjectNode" />
-              <item name="MLSKG" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$1/New Scratch File" value="TEXT&#10;Python" />
-    <property name="last_opened_file_path" value="C:/Program Files/Git/bin/git.exe" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ManuelCosta\Documents\GitHub\MLSKG\house-prices-advanced-regression-techniques" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -205,7 +186,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.main_test">
+  <component name="RunManager" selected="Python.Regression">
     <configuration name="Classification" type="PythonConfigurationType" factoryName="Python">
       <module name="MLSKG" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -213,13 +194,13 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\mumox\Documents\GitHub\MachineLearning\ML\Scripts\python3.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/santander-customer-transaction-prediction" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\mumox\Documents\GitHub\MLSKG\santander-customer-transaction-prediction\main_train.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../../../../mumox/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/main.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -235,9 +216,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="C:\Users\mumox\Documents\GitHub\MachineLearning\ML\Scripts\python3.exe" />
+      <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/house-prices-advanced-regression-techniques" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -301,7 +282,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\mumox\Documents\GitHub\MachineLearning\ML\Scripts\python3.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/santander-customer-transaction-prediction" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -309,14 +290,14 @@
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="scratch" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="multivariate_analysis" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MLSKG" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -325,11 +306,11 @@
       </envs>
       <option name="SDK_HOME" value="C:\Users\mumox\Documents\GitHub\MachineLearning\ML\Scripts\python3.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/santander-customer-transaction-prediction" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="C:\Users\mumox\.PyCharm2018.2\config\scratches\scratch_houses.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/house-prices-advanced-regression-techniques/multivariate_analysis.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -385,19 +366,19 @@
     <list>
       <item itemvalue="Python.Classification" />
       <item itemvalue="Python.Regression" />
-      <item itemvalue="Python.scratch" />
       <item itemvalue="Python.scratch_santander" />
       <item itemvalue="Python.main_test" />
       <item itemvalue="Python.main_train" />
       <item itemvalue="Python.scratch_file" />
+      <item itemvalue="Python.multivariate_analysis" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.multivariate_analysis" />
         <item itemvalue="Python.main_test" />
         <item itemvalue="Python.main_train" />
+        <item itemvalue="Python.main_train" />
         <item itemvalue="Python.scratch_file" />
-        <item itemvalue="Python.scratch_santander" />
-        <item itemvalue="Python.scratch" />
       </list>
     </recent_temporary>
   </component>
@@ -414,12 +395,26 @@
       <workItem from="1557574153407" duration="8039000" />
       <workItem from="1557678472594" duration="1893000" />
       <workItem from="1557748787652" duration="3367000" />
-      <workItem from="1557755912760" duration="188000" />
+      <workItem from="1557755912760" duration="6009000" />
+      <workItem from="1557768626126" duration="575000" />
+      <workItem from="1557832874982" duration="5025000" />
+      <workItem from="1557919682480" duration="5755000" />
+      <workItem from="1557957865899" duration="3566000" />
+      <workItem from="1558000523920" duration="4996000" />
+      <workItem from="1558961308350" duration="12184000" />
+      <workItem from="1559038354014" duration="2891000" />
+      <workItem from="1559045533663" duration="1955000" />
+      <workItem from="1560010360408" duration="2794000" />
+      <workItem from="1560086909058" duration="4698000" />
+      <workItem from="1560178100570" duration="1580000" />
+      <workItem from="1560179698977" duration="3615000" />
+      <workItem from="1560259865912" duration="2364000" />
+      <workItem from="1560780081632" duration="241000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13487000" />
+    <option name="totallyTimeSpent" value="71547000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -434,13 +429,13 @@
     <frame x="0" y="0" width="1536" height="864" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3163539" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.34316355" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32986626" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32954547" />
       <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Run" maximized="true" order="2" type="WINDOWED" weight="0.32986626" />
-      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Debug" order="3" type="WINDOWED" weight="0.39970282" />
+      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Debug" maximized="true" order="3" type="WINDOWED" weight="0.39970282" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32986626" />
@@ -448,24 +443,24 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32986626" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32954547" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.25126263" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="23" width="1366" height="715" id="SciView" order="3" sideWeight="0.49925706" weight="0.7065053" />
+      <window_info anchor="right" x="0" y="23" width="1366" height="715" id="SciView" order="3" sideWeight="0.49925706" weight="0.64343166" />
       <window_info anchor="right" id="Database" order="4" />
       <window_info anchor="right" x="0" y="0" width="291" height="568" id="Documentation" order="5" sideWeight="0.5007429" side_tool="true" weight="0.7065053" />
       <window_info anchor="right" id="Coverage" order="6" side_tool="true" />
-      <window_info anchor="right" x="0" y="0" width="1366" height="738" id="Python Console" order="7" weight="0.5173979" />
+      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="Python Console" maximized="true" order="7" type="WINDOWED" weight="0.57707775" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.31240544" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.34316355" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32986626" />
-      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Run" order="2" type="WINDOWED" weight="0.32986626" />
-      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Debug" order="3" type="WINDOWED" weight="0.39970282" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32954547" />
+      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Run" maximized="true" order="2" type="WINDOWED" weight="0.32986626" />
+      <window_info anchor="bottom" x="0" y="23" width="1366" height="715" id="Debug" maximized="true" order="3" type="WINDOWED" weight="0.39970282" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32986626" />
@@ -473,30 +468,45 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.32986626" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32986626" />
+      <window_info anchor="bottom" id="Terminal" order="11" visible="true" weight="0.25126263" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" x="0" y="23" width="1366" height="715" id="SciView" order="3" show_stripe_button="false" weight="0.7065053" />
+      <window_info anchor="right" x="0" y="23" width="1366" height="715" id="SciView" order="3" sideWeight="0.49925706" weight="0.64343166" />
       <window_info anchor="right" id="Database" order="4" />
-      <window_info anchor="right" x="0" y="0" width="291" height="568" id="Documentation" order="5" side_tool="true" visible="true" weight="0.32980332" />
+      <window_info anchor="right" x="0" y="0" width="291" height="568" id="Documentation" order="5" sideWeight="0.5007429" side_tool="true" weight="0.7065053" />
       <window_info anchor="right" id="Coverage" order="6" side_tool="true" />
-      <window_info active="true" anchor="right" x="0" y="0" width="1366" height="738" id="Python Console" order="7" visible="true" weight="0.48940998" />
+      <window_info anchor="right" x="0" y="23" width="1536" height="801" id="Python Console" maximized="true" order="7" type="WINDOWED" weight="0.57707775" />
     </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="X_train.astype(float)" language="Python" />
+        <watch expression="np.mean(scores,axis=0)" language="Python" />
+        <watch expression="np.mean(scores,axis=1)" language="Python" />
+        <watch expression="df_test.shape" language="Python" />
+        <watch expression="df_train.shape" language="Python" />
       </configuration>
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/MLSKG$main_test.coverage" NAME="main_test Coverage Results" MODIFIED="1557624890736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
-    <SUITE FILE_PATH="coverage/MLSKG$main_train.coverage" NAME="main_train Coverage Results" MODIFIED="1557575842951" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
+    <SUITE FILE_PATH="coverage/MLSKG$multivariate_analysis.coverage" NAME="multivariate_analysis Coverage Results" MODIFIED="1560012286631" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
+    <SUITE FILE_PATH="coverage/MLSKG$main_test.coverage" NAME="main_test Coverage Results" MODIFIED="1558966183846" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
+    <SUITE FILE_PATH="coverage/MLSKG$main_train.coverage" NAME="main_train Coverage Results" MODIFIED="1558000953209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/santander-customer-transaction-prediction" />
+    <SUITE FILE_PATH="coverage/MLSKG$Regression.coverage" NAME="Regression Coverage Results" MODIFIED="1560268708286" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/house-prices-advanced-regression-techniques" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
@@ -530,7 +540,47 @@
     </expressions>
     <expressions id="evaluateExpression">
       <expression>
-        <expression-string>train_data.shape</expression-string>
+        <expression-string>predictions</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>pred</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>scores</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>scores.min()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>scores.mean()</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>scores.min</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>(np.exp(sales_predictions[0]) * scaler.var_ ) + scaler.mean_</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.exp(sales_predictions[0]) * scaler.var_</expression-string>
+        <language-id>Python</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>np.exp(sales_predictions[0])</expression-string>
         <language-id>Python</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -538,19 +588,8 @@
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/../MachineLearning/ML/Lib/site-packages/matplotlib/axes/_axes.py" />
-    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_encode_explained.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/train_houses.csv" />
-    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/encoded_train_houses.csv" />
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_encode_explained.txt" />
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_houses.txt" />
-    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="136">
-          <caret line="8" column="35" selection-start-line="8" selection-end-line="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_houses.py" />
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/norm_pca.csv" />
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/original_pca.csv" />
@@ -562,24 +601,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/models.joblib" />
-    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/sample_submission.csv" />
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/lda_model_submission.csv" />
     <entry file="file://$PROJECT_DIR$/../MachineLearning/ML/Lib/site-packages/sklearn/preprocessing/data.py" />
     <entry file="file://$PROJECT_DIR$/../MachineLearning/ML/Lib/site-packages/sklearn/utils/validation.py" />
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch.txt" />
     <entry file="file://$PROJECT_DIR$/../MachineLearning/ML/Lib/site-packages/sklearn/base.py" />
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_santander.py" />
-    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/svm_rbf_model_submission.csv" />
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/svm_rbf_model.joblib">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/svm_linear_model_submission.csv" />
-    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/train.csv">
-      <provider selected="true" editor-type-id="LargeFileEditor">
-        <state relative-caret-position="17">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ML-64/Lib/site-packages/numpy/lib/npyio.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -630,20 +659,42 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="57">
-          <caret line="4" selection-start-line="4" selection-end-line="4" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="266">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
         </state>
       </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="114">
+          <caret line="6" column="13" lean-forward="true" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/sample_submission.csv">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/test.csv">
       <provider selected="true" editor-type-id="LargeFileEditor">
         <state relative-caret-position="19">
-          <caret line="1" column="768" lean-forward="true" selection-start-line="1" selection-start-column="768" selection-end-line="1" selection-end-column="768" />
+          <caret line="1" column="768" selection-start-line="1" selection-start-column="768" selection-end-line="1" selection-end-column="768" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/svm_parameters.py" />
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/svm_linear_model_submission.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="9" lean-forward="true" selection-start-line="14" selection-start-column="9" selection-end-line="14" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/submission.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="14" column="11" lean-forward="true" selection-end-line="200001" />
         </state>
       </provider>
     </entry>
@@ -657,35 +708,79 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_description.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="129" column="47" selection-start-line="129" selection-start-column="47" selection-end-line="129" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/encoded_train_houses.csv" />
     <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/main_train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="162" column="24" selection-start-line="162" selection-start-column="24" selection-end-line="162" selection-end-column="24" />
+        <state relative-caret-position="636">
+          <caret line="212" selection-start-line="212" selection-end-line="213" selection-end-column="63" />
           <folding>
             <element signature="e#15#34#0" expanded="true" />
-            <marker date="1557752090592" expanded="true" signature="1099:1413" ph="..." />
+            <marker date="1558000947758" expanded="true" signature="2432:2746" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/requirements.txt">
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/train_houses.csv">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/data_description.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="114">
-          <caret line="6" column="13" lean-forward="true" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        <state relative-caret-position="501">
+          <caret line="166" column="6" selection-start-line="166" selection-end-line="166" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/train.csv">
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="-1292">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/test.csv">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="399">
-          <caret line="21" column="7" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
+        <state>
+          <caret selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/sample_submission.csv">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/linear_submission.csv">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="402">
+          <caret line="162" column="52" lean-forward="true" selection-start-line="162" selection-start-column="52" selection-end-line="162" selection-end-column="52" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/house-prices-advanced-regression-techniques/multivariate_analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="551">
+          <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
+          <folding>
+            <element signature="e#133#152#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/santander-customer-transaction-prediction/main_test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="171">
+          <caret line="10" column="70" selection-start-line="10" selection-start-column="70" selection-end-line="10" selection-end-column="70" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

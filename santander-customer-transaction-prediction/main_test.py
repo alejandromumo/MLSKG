@@ -1,17 +1,19 @@
 from joblib import load
 from pandas import read_csv, DataFrame, concat
 
-# TODO scale data
+
+basedir = "C:/Users/ManuelCosta/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/"
+
 
 def test_model(filename, output_file_name):
-    model = load(filename)
+    model = load(basedir + filename)
     print(model)
     predictions = DataFrame(model.predict(X_test), columns=["target"])
     balance = predictions["target"].value_counts()
     print("Predictions balance : ")
     print(balance)
     submission = DataFrame(concat([test_data["ID_code"], predictions], axis=1), columns=["ID_code", "target"])
-    submission.to_csv(output_file_name, sep=",", header=True, index=False)
+    submission.to_csv(basedir + output_file_name, sep=",", header=True, index=False)
 
 # Load the test data
 d = {'ID_code' : 'object', 'target' : 'int32', 'var_0' : 'float32',
@@ -55,9 +57,18 @@ d = {'ID_code' : 'object', 'target' : 'int32', 'var_0' : 'float32',
      'var_186' : 'float32', 'var_187' : 'float32', 'var_188' : 'float32', 'var_189' : 'float32', 'var_190' : 'float32',
      'var_191' : 'float32', 'var_192' : 'float32', 'var_193' : 'float32', 'var_194' : 'float32', 'var_195' : 'float32',
      'var_196' : 'float32', 'var_197' : 'float32', 'var_198' : 'float32', 'var_199' : 'float32'}
-test_data = read_csv("test.csv", dtype=d)
-test_data.info()
-X_test = test_data.iloc[:, 1:]
+test_data = read_csv(basedir + "test.csv",
+                     dtype=d)
+# Scale data
+# Import scaler from training
+scaler = load("train_scaler.joblib")
+scaler.data_min_ = scaler.data_min_[1:]
+scaler.data_max_ = scaler.data_max_[1:]
+scaler.data_range_ = scaler.data_range_[1:]
+scaler.min_ = scaler.min_[1:]
+scaler.scale_ = scaler.scale_[1:]
+X_test = test_data.iloc[:, 1:].values
+X_test = scaler.transform(X_test)
 # Choose a model to test
 logistic = False
 linear = False
@@ -75,7 +86,7 @@ elif quadratic:
     submission_output_file_name = "qda_model_submission.csv"
 elif svm:
     model_file_name = "svm_rbf_model.joblib"
-    submission_output_file_name = "svm_rbf_model_submission.csv"
+    submission_output_file_name = "submission.csv"
 # Test the model
 test_model(model_file_name, submission_output_file_name)
 
@@ -87,5 +98,22 @@ test_model(model_file_name, submission_output_file_name)
 # Predictions balance :
 # 1.0    199804
 # 0.0       196
+
+
+# SVC(C=1024, cache_size=1000, class_weight={0: 0.10049, 1: 0.89951}, coef0=0.0,
+#     decision_function_shape='ovr', degree=3, gamma=3.0517578125e-05,
+#     kernel='rbf', max_iter=-1, probability=False, random_state=None,
+#     shrinking=True, tol=0.001, verbose=False)
+# Predictions balance :
+# 0.0    146542
+# 1.0     53458
+
+# SVC(C=512, cache_size=1000, class_weight={0: 0.10049, 1: 0.89951}, coef0=0.0,
+#     decision_function_shape='ovr', degree=3, gamma=3.0517578125e-05,
+#     kernel='rbf', max_iter=-1, probability=False, random_state=None,
+#     shrinking=True, tol=0.001, verbose=False)
+# Predictions balance :
+# 0.0    146561
+# 1.0     53439
 
 
