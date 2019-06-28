@@ -1,5 +1,3 @@
-# invite people for the Kaggle party
-# From: https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,6 +10,7 @@ warnings.filterwarnings('ignore')
 
 
 def transform_train_data(df_train):
+    # From: https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!
     returned_objects = []
     # dealing with missing data
     total = df_train.isnull().sum().sort_values(ascending=False)
@@ -24,7 +23,6 @@ def transform_train_data(df_train):
     df_train = df_train.drop(df_train.loc[df_train['Electrical'].isnull()].index)
     df_train.isnull().sum().max()  # just checking that there's no missing data missing...
     # standardizing data
-    # TODO Try without scaling and log the target SalePrice
     scaler = StandardScaler()
     # saleprice_scaled = scaler.fit_transform(df_train['SalePrice'][:, np.newaxis])
     returned_objects.append(scaler)
@@ -38,25 +36,19 @@ def transform_train_data(df_train):
     df_train = df_train.drop(df_train[df_train['Id'] == 1299].index)
     df_train = df_train.drop(df_train[df_train['Id'] == 524].index)
     # applying log transformation to achieve normal distribution
-    # TODO do I need to apply inverse log in test to obtain thousands of dollars?
     df_train['SalePrice'] = np.log(df_train['SalePrice'])
     # data transformation
-    # TODO use inverse (exp) in testing
     df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
     # create column for new variable (one is enough because it's a binary categorical feature)
     # if area>0 it gets 1, for area==0 it gets 0
-    # TODO add this
     df_train['HasBsmt'] = pd.Series(len(df_train['TotalBsmtSF']), index=df_train.index)
     df_train['HasBsmt'] = 0
-    # TODO apply this on test
     # Every house that has basement SF bigger than 0, set hasBsmt to 1
     df_train.loc[df_train['TotalBsmtSF']>0,'HasBsmt'] = 1
     # transform data
-    # TODO apply this on test. Use inverse (exp) in testing
     # Every house with basement, transform the squared feet to log
     df_train.loc[df_train['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
     # convert categorical variable into dummy
-    # TODO apply this on test
     # TODO try customized encoding
     new_df = pd.get_dummies(df_train)
     print(new_df.columns)
@@ -64,8 +56,7 @@ def transform_train_data(df_train):
 
 
 def transform_test_data(df_test, dropped_features, train_features):
-    print(dropped_features)
-    # First: drop features and add
+    # First: drop features and add new ones
     # Second: apply inverse log (exp) to:
     #   - GrLivArea
     #   - TotalBsmtSF
@@ -85,13 +76,6 @@ def transform_test_data(df_test, dropped_features, train_features):
     df_test = df_test.fillna(0)
     df_test = df_test.drop("SalePrice", axis=1)
     return df_test
-
-
-def to_thousands_of_dollars(scaler):
-    pass
-
-
-
 
 
 def get_plots_and_analysis(df_train):
