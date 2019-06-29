@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from numpy.random import shuffle
 import matplotlib.pyplot as plt
+import seaborn as sns
 # Utilities imports
 import os
 import psutil
@@ -11,32 +12,51 @@ import platform
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import KFold
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, balanced_accuracy_score
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.metrics import accuracy_score, balanced_accuracy_score, roc_auc_score
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
 from sklearn.svm import SVC, LinearSVC, NuSVC
-from sklearn.feature_selection import RFE, RFECV
+from sklearn.ensemble import RandomForestClassifier
 # Other imports
 from numpy import linalg as LA
 from joblib import dump
+import time
 
-# ----                         ----#
-# ---- Parameters are          ----#
-# ---- initialized here,       ----#
-# ---- change only this        ----#
-# ---- portion !               ----#
-# ----                         ----#
+
+"""
+Global parameters
+"""
+process = psutil.Process(os.getpid())
+architecture = platform.architecture()
+print(architecture)
+if architecture[0] != '64bit':
+    raise Warning("It is recommended to use the 64-bit version of python's interpreter due to memory constraints")
+
+"""
+    ----                                ----
+    ----        Parameters are          ----
+    ----        initialized here,       ----
+    ----        change only this        ----
+    ----        section !               ----
+    ----                                ----
+"""
+# Basedir where to look for the datasets
+basedir = "C:/Users/ManuelCosta/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/"
 
 # Select mode
-mode = 'evaluation'
+mode = 'evaluation'  # Supported: evaluation or tuning
 # Select which model to train
-model = 'svm'
+model = 'rf'
 # K-cross validation parameters
 k = 10
 # Perform feature selection
 feature_selection = False
 # Perform sub sampling
-sub_sampling = False
-sample_size = 0.0025
+if model == 'svm' and mode == 'tuning':
+    sub_sampling = True
+    sample_size = 0.025
+else:
+    sub_sampling = False
+    sample_size = 1
 # Logistic regression classifier specific parameters
 solver = 'lbfgs'
 # SVM classifier specific parameters
@@ -46,15 +66,29 @@ nu = 0.2  # used for NuSVC
 # ----                         ----#
 # ---- Don't edit after this ! ----#
 # ----                         ----#
-if mode == 'evaluation':
-    C_values = [512]
-    gamma_values = [0.000030517578125]
-elif mode == 'tuning':
-    C_values = [2 ** x for x in range(-5, 15)]  # 11 values or 4   -5 to 15
-    gamma_values = [2 ** x for x in range(-15, 3)]  # 11 values or 4   -15 to 3
+if model == 'svm':
+    if mode == 'evaluation':
+        C_values = [8192]
+        gamma_values = [3.0517578125e-05]
+    elif mode == 'tuning':
+        C_values = [2 ** x for x in range(-5, 15)]  # 11 values or 4   -5 to 15
+        gamma_values = [2 ** x for x in range(-15, 3)]  # 11 values or 4   -15 to
+    else:
+        raise ValueError("Wrong argument mode!")
+elif model == 'logistic':
+    if mode == 'evaluation':
+        C_values = [1.0000000000000005e-09]
+        gamma_values = [0]
+    elif mode == 'tuning':
+        C_values = [(1/10)**x for x in range(2, 10)]
+        gamma_values = [0]
+    else:
+        raise ValueError("Wrong argument mode!")
 else:
-    raise ValueError("Wrong argument mode!")
-hyper_parameters = {'model': 'svm',
+    C_values = [0]
+    gamma_values = [0]
+
+hyper_parameters = {'model': model,
                     'kernel': kernel,
                     'cache_size': cache_size,
                     'C_values': C_values,
@@ -63,6 +97,14 @@ hyper_parameters = {'model': 'svm',
 
 
 def weighted_mean_absolute_error(y_true, y_pred, weights):
+    """
+    OBSOLETE
+    Calculates the mean absolute error. Each sample's score has a weight according to the dataset balance.
+    :param y_true: Target real values
+    :param y_pred: Target predicted values
+    :param weights: Dataset weights for both classes
+    :return: Weighted mean absolute error of the given predictions according to the real values
+    """
     if len(y_true) != len(y_pred):
         raise Exception("Y and predictions must have the same size! Given: y_true :{} \t y_pred : {}".format
                         (len(y_true), len(y_pred)))
@@ -79,6 +121,14 @@ def weighted_mean_absolute_error(y_true, y_pred, weights):
 
 
 def scorer(estimator, X, y):
+    """
+    OBSOLETE
+    Custom scorer to be used as parameter in sk-learn model
+    :param estimator: estimator to be used
+    :param X: X
+    :param y: y
+    :return: score
+    """
     class_weights = estimator.get_params().get('class_weight')
     y_pred = estimator.predict(X)
     size = len(y)
@@ -94,12 +144,33 @@ def scorer(estimator, X, y):
 
 
 def print_mem_usage(tab=""):
+    """
+    Prints the current memory usage
+    :param tab:
+    """
     memory_usage = process.memory_info().rss / (1024 * 1024)
     print(tab + "Memory usage : {} MB".format(memory_usage))
 
 
+def get_model_id():
+    """
+    Returns the ID to save the new model
+    :return:
+    """
+    count = 0
+    for file in os.listdir(basedir):
+        if file.endswith(".joblib"):
+            count += 1
+    return count + 1
+
 
 def load_data(file_name="train.csv"):
+    """
+    Loads training data set and scales it. Dumps the scaler using joblib in a file called "train_scaler.joblib" to later
+    be used to scale the test data.
+    :param file_name: file name to be loaded
+    :return: train data as a ndarray
+    """
     # Load data set and analyze it
     # Force data types to optimize memory usage
     d = {'ID_code': 'object', 'target': 'int32', 'var_0': 'float32',
@@ -143,10 +214,15 @@ def load_data(file_name="train.csv"):
          'var_186': 'float32', 'var_187': 'float32', 'var_188': 'float32', 'var_189': 'float32', 'var_190': 'float32',
          'var_191': 'float32', 'var_192': 'float32', 'var_193': 'float32', 'var_194': 'float32', 'var_195': 'float32',
          'var_196': 'float32', 'var_197': 'float32', 'var_198': 'float32', 'var_199': 'float32'}
-    train_data = pd.read_csv("C:/Users/ManuelCosta/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/"
-                             + file_name,
+    train_data = pd.read_csv(basedir + file_name,
                              dtype=d, lineterminator='\n')
     train_data = train_data.iloc[:, 1:].values
+    """
+    Data Set balance
+    """
+    # Class 0: 179902  (Negative)
+    # Class 1: 20098   (Positive)
+    # Proportion: 8.95 : 1
     scaler = MinMaxScaler()
     train_data = scaler.fit_transform(train_data)
     dump(scaler, "train_scaler.joblib")
@@ -154,6 +230,12 @@ def load_data(file_name="train.csv"):
 
 
 def sub_sample(sample_size, original_data):
+    """
+    Sub samples the data in samples of given size
+    :param sample_size: sample size
+    :param original_data: data to be sampled
+    :return: sampled data as a tuple (X, y)
+    """
     target_count_0 = int((sample_size * target_count[0]))
     target_count_1 = int((sample_size * target_count[1]))
     data_0 = original_data[original_data[:, 0] == 0, 0:]
@@ -171,9 +253,274 @@ def sub_sample(sample_size, original_data):
     return X,y
 
 
-def perform_k_cross(X, y, class_weight, k=10, model_properties=None, output_file=None):
+"""
+Models' hyper-parameters tuning
+"""
+
+
+def svm_c_gamma_tuning(k=10, model_properties=None):
     """
-    Perform k-cross validation with given arguments. Writes output to given file in file path.
+    SVM's hyperparameter C and gamma tuning. Uses K-Cross validation (10-fold by default).
+    :param k: Number of folds to perform CV
+    :param model_properties: properties of the svm model
+    """
+    kf = KFold(n_splits=k, shuffle=False)
+    C_values = model_properties.get('C_values')
+    gamma_values = model_properties.get('gamma_values')
+    kernel = model_properties.get('kernel')
+    cache_size = model_properties.get('cache_size')
+    total_runs = len(C_values) * len(gamma_values) * k
+    print("{} models will be trained".format(total_runs))
+    i = 0
+    errors = list()
+    times = list()
+    for gamma in gamma_values:
+        for C in C_values:
+            tmp = []
+            tmp_acc = []
+            for train_index, test_index in kf.split(X):
+                start = time.time()
+                X_train, X_test = X[train_index, :], X[test_index, :]
+                y_train, y_test = y[train_index], y[test_index]
+                print("Training a SVM model")
+                current_model = SVC(C=C, kernel=kernel, gamma=gamma, class_weight=class_weight,
+                                    cache_size=cache_size)
+                current_model.fit(X_train, y_train)
+                predictions = current_model.predict(X_test)
+                error = roc_auc_score(y_test, predictions)
+                ba = balanced_accuracy_score(y_test, predictions)
+                tmp.append(error)
+                tmp_acc.append(ba)
+                i += 1
+                print("\tTrained {} models so far. {} remaining".format(i, total_runs - i))
+                end = time.time()
+                run = end - start
+                times.append(run)
+                remaining_time = np.mean(times) * total_runs-i
+                print("\tAverage seconds per model : {}\n\tExpected remaining seconds: {} ({} minutes)".
+                      format(np.mean(times), remaining_time, remaining_time/60))
+            mean_error = np.mean(tmp)
+            mean_acc = np.mean(tmp_acc)
+            errors.append([C, gamma, mean_error, mean_acc])
+    errors_array = np.array(errors)
+    best_entry = errors_array[np.argmax(errors_array[:, 2])]
+    best_gamma = best_entry[0]
+    best_C = best_entry[1]
+    print("Best C, gamma : {},{}".format(best_C, best_gamma))
+
+
+def logistic_c_tuning(k=10, model_properties=None, plot=False):
+    """
+    Logistic Regression hyperparameter C tuning. Uses K-Cross validation (10-fold by default).
+    :param k: Number of folds to perform CV
+    :param model_properties: properties of the logistic regression model (C values to be tested)
+    """
+    kf = KFold(n_splits=k, shuffle=False)
+    C_values = model_properties.get('C_values')
+    total_runs = len(C_values) * k
+    i = 0
+    errors = list()
+    for C in C_values:
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index, :], X[test_index, :]
+            y_train, y_test = y[train_index], y[test_index]
+            print("Training a logistic model with solver = {}".format(solver))
+            current_model = LogisticRegression(class_weight=class_weight, solver=solver,penalty="l2", max_iter=500,
+                                       C=C)
+            current_model.fit(X_train, y_train)
+            predictions = current_model.predict(X_test)
+            error = roc_auc_score(y_test, predictions)
+            errors.append(error)
+            i += 1
+            print("\tTrained {} models so far. {} remaining".format(i, total_runs - i))
+    splits_acc = np.split(np.array(errors), len(C_values))
+    means = np.mean(splits_acc, axis=1)
+    best_C = C_values[np.argmin(means)]
+    print("Best C : {}".format(best_C))
+    if plot:
+        f, ax = plt.subplots(figsize=(5, 5))
+        # ax.xaxis.set_ticks(np.arange(0, 0.1, 0.01))
+        d = pd.Series(means, index=C_values)
+        fig = sns.lineplot(data=d)
+        fig.set_title("Logistic CV scores for different regularization factors\n (k={})".format(k))
+        fig.set_xlabel("C")
+        fig.set_ylabel("accuracy")
+        plt.show()
+
+
+def rf_tuning(k=10, plot=False):
+    kf = KFold(n_splits=k, shuffle=False)
+    total_runs = len(C_values) * k
+    i = 0
+    errors = list()
+    for C in C_values:
+        for train_index, test_index in kf.split(X):
+            X_train, X_test = X[train_index, :], X[test_index, :]
+            y_train, y_test = y[train_index], y[test_index]
+            print("Training a logistic model with solver = {}".format(solver))
+            current_model = LogisticRegression(class_weight=class_weight, solver=solver,penalty="l2", max_iter=500,
+                                       C=C)
+            current_model.fit(X_train, y_train)
+            predictions = current_model.predict(X_test)
+            error = roc_auc_score(y_test, predictions)
+            errors.append(error)
+            i += 1
+            print("\tTrained {} models so far. {} remaining".format(i, total_runs - i))
+    splits_acc = np.split(np.array(errors), len(C_values))
+    means = np.mean(splits_acc, axis=1)
+    best_C = C_values[np.argmin(means)]
+    print("Best C : {}".format(best_C))
+    if plot:
+        f, ax = plt.subplots(figsize=(5, 5))
+        # ax.xaxis.set_ticks(np.arange(0, 0.1, 0.01))
+        d = pd.Series(means, index=C_values)
+        fig = sns.lineplot(data=d)
+        fig.set_title("Logistic CV scores for different regularization factors\n (k={})".format(k))
+        fig.set_xlabel("C")
+        fig.set_ylabel("accuracy")
+        plt.show()
+
+
+"""
+Models' training
+"""
+
+
+def logistic_training(X, y, model_properties, class_weight, plot=False):
+    """
+    Logistic Regression model training. Estimates the test error and computes the training error.
+    :param X:
+    :param y:
+    :param model_properties:
+    :param class_weight:
+    :param plot:
+    :return:
+    """
+    C_values = model_properties.get('C_values')
+    estimator = LogisticRegression(class_weight=class_weight, solver=solver, penalty="l2", max_iter=500, C=C_values[0])
+    estimated_test_error = estimate_test_error(estimator, X, y)
+    print("Estimated test error for {}  model (alpha={}): {}".format(type(estimator).__name__, C_values[0],
+                                                                     estimated_test_error))
+    current_model = LogisticRegression(class_weight=class_weight, solver=solver, penalty="l2", max_iter=500,
+                                       C=C_values[0])
+    current_model.fit(X, y)
+    y_pred = current_model.predict(X)
+    error = roc_auc_score(y, y_pred)
+    print("Training error for {} model (alpha={}): {}".format(type(current_model).__name__, C_values[0],
+                                                              error))
+    return current_model
+
+
+def svm_training(X, y, model_properties, class_weight, plot=False):
+    """
+    SVM model training. Estimates the test error and computes the training error.
+    :param X:
+    :param y:
+    :param model_properties:
+    :param class_weight:
+    :param plot:
+    :return:
+    """
+    C_values = model_properties.get('C_values')
+    gamma_values = model_properties.get('gamma_values')
+    kernel = model_properties.get('kernel')
+    cache_size = model_properties.get('cache_size')
+    total_runs = len(C_values) * len(gamma_values) * k
+    C = C_values[0]
+    gamma = gamma_values[0]
+    # estimator = SVC(C=C, kernel=kernel, gamma=gamma, class_weight=class_weight, cache_size=cache_size)
+    # estimated_test_error = estimate_test_error(estimator, X, y)
+    # print("Estimated test error for model {} :\n\t{}".format(estimator.get_params(), estimated_test_error))
+    current_model = SVC(C=C, kernel=kernel, gamma=gamma, class_weight=class_weight, cache_size=cache_size)
+    current_model.fit(X, y)
+    y_pred = current_model.predict(X)
+    error = roc_auc_score(y, y_pred)
+    print("Training error for model {} :\n\t{}".format(current_model.get_params(), error))
+    return current_model
+
+
+def lda_training(X, y):
+    """
+    Linear Discriminant Analysis model training. Estimates the test error and computes the training error.
+    :param X:
+    :param y:
+    :return:
+    """
+    estimator = LinearDiscriminantAnalysis()
+    estimated_test_error = estimate_test_error(estimator, X, y)
+    print("Estimated test error for model {} :\n\t{}".format(estimator.get_params(), estimated_test_error))
+    current_model = LinearDiscriminantAnalysis()
+    current_model.fit(X, y)
+    y_pred = current_model.predict(X)
+    error = roc_auc_score(y, y_pred)
+    print("Training error for model {} :\n\t{}".format(current_model.get_params(), error))
+    return current_model
+
+
+def qda_training(X, y):
+    """
+    Quadratic Discriminant Analysis model training. Estimates the test error and computes the training error.
+    :param X:
+    :param y:
+    :return:
+    """
+    estimator = QuadraticDiscriminantAnalysis()
+    estimated_test_error = estimate_test_error(estimator, X, y)
+    print("Estimated test error for model {} :\n\t{}".format(estimator.get_params(), estimated_test_error))
+    current_model = QuadraticDiscriminantAnalysis()
+    current_model.fit(X, y)
+    y_pred = current_model.predict(X)
+    error = roc_auc_score(y, y_pred)
+    print("Training error for model {} :\n\t{}".format(current_model.get_params(), error))
+    return current_model
+
+
+def rf_training(X, y):
+    estimator = RandomForestClassifier(n_estimators=500, class_weight=class_weight)
+    estimated_test_error = estimate_test_error(estimator, X, y)
+    print("Estimated test error for model {} :\n\t{}".format(estimator.get_params(), estimated_test_error))
+    current_model = RandomForestClassifier(n_estimators=500, class_weight=class_weight)
+    current_model.fit(X, y)
+    y_pred = current_model.predict(X)
+    error = roc_auc_score(y, y_pred)
+    print("Training error for model {} :\n\t{}".format(current_model.get_params(), error))
+    return current_model
+
+
+"""
+Helper methods
+"""
+
+
+def estimate_test_error(estimator, X, y, k=5):
+    """
+    Computes the estimated test error for the given estimator. Uses Cross-Validation (K=5 by default).
+    Uses ROC Area Under the Curve metric to evaluate models.
+    Returns the mean of every model's error.
+    :param estimator:
+    :param X:
+    :param y:
+    :param k:
+    :return:
+    """
+    kf = KFold(n_splits=k)
+    errors = list()
+    for train_index, test_index in kf.split(X):
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
+        estimator.fit(X_train, y_train)
+        y_pred = estimator.predict(X_test)
+        # error = balanced_accuracy_score(y_test, y_pred)
+        error = roc_auc_score(y_test, y_pred)
+        errors.append(error)
+    mean_error = np.mean(np.array(errors))
+    return mean_error
+
+
+def main_tmp(X, y, class_weight, k=10, model_properties=None, output_file=None):
+    """
+    (OBSOLETE)
+    Estimates the test error performing k-cross validation with given arguments. Writes output to given file in file path.
     :param X:
     :param y:
     :param k:
@@ -216,7 +563,7 @@ def perform_k_cross(X, y, class_weight, k=10, model_properties=None, output_file
                 # Instantiate Linear Discriminant Analysis classifier
                 if model == 'linear':
                     print(tab*"\t" + "Training a linear model")
-                    current_model = LinearDiscriminantAnalysis(solver='lsqr')
+                    current_model = LinearDiscriminantAnalysis(priors=class_weight)
                 # Instantiate Logistic Regression Classifier with regularization parameter C.
                 elif model == 'logistic':
                     print(tab*"\t" + "Training a logistic model with solver = {}".format(solver))
@@ -225,49 +572,59 @@ def perform_k_cross(X, y, class_weight, k=10, model_properties=None, output_file
                 # Instantiate Quadratic Discriminant Analaysis classifier
                 elif model == 'quadratic':
                     print(tab*"\t" + "Training a quadratic model")
-                    current_model = LinearDiscriminantAnalysis(solver='lsqr')
+                    current_model = QuadraticDiscriminantAnalysis(priors=class_weight)
                 # Instantiate Support Vector Machine classifier
                 elif model == 'svm':
                     print(tab*"\t" + "Training a SVM model")
                     # current_model = LinearSVC(C=C, class_weight=class_weight, dual=False)
-                    current_model = SVC(C=C, kernel=kernel, gamma=gamma, class_weight=class_weight, cache_size=cache_size)
+                    current_model = SVC(C=C, kernel=kernel, gamma=gamma, class_weight=class_weight,
+                                        cache_size=cache_size)
                     # current_model = NuSVC(gamma=gamma, kernel=kernel, verbose=True,
-                    #  class_weight=class_weight, nu=nu, cache_size=cache_size)
                 else:
                     raise Exception("Current model is None!")
                 print(tab*"\t" + "Model created. Fitting data")
                 print_mem_usage(tab*"\t")
-                # Train the model without feature selection and compute the score for the current split
                 current_model.fit(X_train, y_train)
                 print(tab*"\t" + "Data fit. Making predictions")
                 print_mem_usage(tab*"\t")
                 predictions = current_model.predict(X_test)
                 error = weighted_mean_absolute_error(y_true=y_test, y_pred=predictions, weights=class_weight)
                 if model != 'svm' or kernel != "rbf":
-                    accuracy = accuracy_score(y_true=y_test, y_pred=predictions)
                     coefficients = current_model.coef_
                     J = error + (C * LA.norm(coefficients, 2))
+                    accuracy = balanced_accuracy_score(y_true=y_test, y_pred=predictions)
                 else:
                     accuracy = balanced_accuracy_score(y_true=y_test, y_pred=predictions)
                     J = 1/accuracy
                 accuracies.append(accuracy)
                 errors.append(J)
-            # Compute the mean scores for the current hyper parameters
-            mean_accuracy = sum(accuracies) / len(accuracies)
-            mean_error = sum(errors) / len(errors)
-            # Update the score matrix
-            score_matrix.append([C, gamma, mean_error, mean_accuracy])
+                # Update the score matrix
+            if model == 'svm':
+                score_matrix.append([C, gamma, accuracies, errors])
+            elif model == 'logistic':
+                score_matrix.append([C, accuracies, errors])
+            else:
+                score_matrix.append([accuracies, errors])
     # Print score matrix
-    out = open(output_file, 'w')
+    # out = open(output_file, 'w')
     print("\n\nScore Matrix:\n"
           "C, gamma, score, accuracy")
     for l in score_matrix:
         print(l)
-        out.write(l)
-    out.close()
+    #     out.write(l)
+    # out.close()
+    print()
 
 
 def train_model_to_evaluate(X, Y, class_weight, model_properties=None):
+    """
+    Trains one model to be evaluated. After training a model, dumps it to a MODEL_NAME_ID.joblib file to be tested.
+    :param X:
+    :param Y:
+    :param class_weight:
+    :param model_properties:
+    :return:
+    """
     # Train one single model and save it
     print("Training one single model")
     C_values = model_properties.get('C_values')
@@ -275,53 +632,28 @@ def train_model_to_evaluate(X, Y, class_weight, model_properties=None):
     model = model_properties.get('model')
     kernel = model_properties.get('kernel')
     cache_size = model_properties.get('cache_size')
-    current_model = SVC(C=C_values[0], kernel=kernel, gamma=gamma_values[0],
-                        class_weight=class_weight, cache_size=cache_size)
-    current_model.fit(X=X, y=Y)
-    # Dump best model to test it with test data set
-    if model=='logistic':
-        dump(current_model, "logistic_model.joblib")
-    if model=='linear':
-        dump(current_model, "lda_model.joblib")
-    if model=='quadratic':
-        dump(current_model, "qda_model.joblib")
-    if model=='svm':
-        dump(current_model, "svm_" + kernel + "_model.joblib")
+    model_id = get_model_id()
+    if model == 'logistic':
+        current_model = logistic_training(X, Y, model_properties, class_weight)
+        dump(current_model, "logistic_model_{}.joblib".format(model_id))
+    elif model == 'linear':
+        current_model = lda_training(X, Y)
+        dump(current_model, "lda_model_{}.joblib".format(model_id))
+    elif model == 'quadratic':
+        current_model = qda_training(X, Y)
+        dump(current_model, "qda_model_{}.joblib".format(model_id))
+    elif model == 'svm':
+        current_model = svm_training(X, Y, model_properties, class_weight)
+        dump(current_model, "svm_" + kernel + "_model_{}.joblib".format(model_id))
+    elif model == 'rf':
+        current_model = rf_training(X, Y)
+        dump(current_model, "rf_model_{}.joblib".format(model_id))
+    else:
+        raise ValueError("Provided model is not compatible!")
 
-
-def feature_selection(X, y):
-    """
-    Not used
-    :return:
-    """
-    f_model = LinearSVC(class_weight=class_weight, dual=False)
-    # Use custom scorer. Change to return 1/J to have an increasing function
-    selector = RFECV(estimator=f_model, step=10, cv=KFold(n_splits=5), scoring=scorer, verbose=1)
-    selector.fit(X=X, y=y)
-    print("Optimal number of features : %d" % selector.n_features_)
-    # Plot number of features VS. cross-validation scores
-    plt.figure()
-    plt.xlabel("Number of features selected")
-    plt.ylabel("Cross validation score (nb of correct classifications)")
-    plt.plot(range(1, len(selector.grid_scores_) + 1), selector.grid_scores_)
-    plt.show()
-    new_train_data = train_data.loc[:, selector.support_]
-    X = new_train_data.iloc[:, 2:]
-    y = new_train_data["target"]
-
-# Global parameters
-process = psutil.Process(os.getpid())
-architecture = platform.architecture()
-print(architecture)
-if architecture[0] != '64bit':
-    raise Warning("It is recommended to use the 64-bit version of python's interpreter due to memory constraints")
-
-# Class 0: 179902  (Negative)
-# Class 1: 20098   (Positive)
-# Proportion: 8.95 : 1
 
 if __name__ == '__main__':
-    # Load data
+    # Load training data
     train_data = load_data()
     # Compute data set balance
     target_count = list()
@@ -332,15 +664,19 @@ if __name__ == '__main__':
                     }
     # Perform sub-sampling
     if sub_sampling:
-        X,y = sub_sample(sample_size=sample_size, original_data=train_data)
+        X, y = sub_sample(sample_size=sample_size, original_data=train_data)
     else:
         X = train_data[:, 1:]
         y = train_data[:, 0]
-    # Train models and find hyper parameters
+    # Find hyper parameters through K-Cross validation
     if mode == 'tuning':
-        perform_k_cross(X=X, y=y, k=k, class_weight=class_weight,
-                        model_properties=hyper_parameters, output_file="")
-    # Train just one model to be evaluated
+        if  hyper_parameters.get('model') == 'logistic':
+            logistic_c_tuning(model_properties=hyper_parameters)
+        elif hyper_parameters.get('model') == 'svm':
+            svm_c_gamma_tuning(model_properties=hyper_parameters)
+        else:
+            raise ValueError("Selected model {} doesn't have any hyper-parameters to be tuned!".format(hyper_parameters.get('model')))
+    # OR train just one model to be evaluated
     elif mode == 'evaluation':
         train_model_to_evaluate(X=X, Y=y, class_weight=class_weight,
                                 model_properties=hyper_parameters)

@@ -1,19 +1,39 @@
 from joblib import load
 from pandas import read_csv, DataFrame, concat
+import os
 
 
 basedir = "C:/Users/ManuelCosta/Documents/GitHub/MLSKG/santander-customer-transaction-prediction/"
+# Command to submit predictions for evaluation
+command = "kaggle competitions submit -c santander-customer-transaction-prediction -f submission.csv -m "
 
 
-def test_model(filename, output_file_name):
+def wrap_and_submit(predictions, message):
+    """
+    Perform a submission to the kaggle competition with the given predictions and message
+    :param predictions: predicted target values to be evaluated
+    :param message: message for the submission
+    :return:
+    """
+    submission = DataFrame(concat([test_data["ID_code"], predictions], axis=1), columns=["ID_code", "target"])
+    submission.to_csv(basedir + "submission.csv", sep=",", header=True, index=False)
+    os.system(command + "\"" + message + "\"")
+
+
+def test_model(filename):
+    """
+    Loads a model located in a .joblib file with a given name. Proceeds with predicting target values for the test
+    data set that was previously lodaded.
+    :param filename:
+    :return:
+    """
     model = load(basedir + filename)
     print(model)
     predictions = DataFrame(model.predict(X_test), columns=["target"])
     balance = predictions["target"].value_counts()
     print("Predictions balance : ")
     print(balance)
-    submission = DataFrame(concat([test_data["ID_code"], predictions], axis=1), columns=["ID_code", "target"])
-    submission.to_csv(basedir + output_file_name, sep=",", header=True, index=False)
+    wrap_and_submit(predictions, "{}".format(model.get_params()))
 
 # Load the test data
 d = {'ID_code' : 'object', 'target' : 'int32', 'var_0' : 'float32',
@@ -69,26 +89,25 @@ scaler.min_ = scaler.min_[1:]
 scaler.scale_ = scaler.scale_[1:]
 X_test = test_data.iloc[:, 1:].values
 X_test = scaler.transform(X_test)
+
+"""
+Not working as intended. Must be changed manually in order to work
+"""
 # Choose a model to test
 logistic = False
 linear = False
 quadratic = False
 svm = True
-
 if logistic:
     model_file_name = "logistic_model.joblib"
-    submission_output_file_name = "logistic_model_submission.csv"
 elif linear:
-    model_file_name = "lda_model.joblib"
-    submission_output_file_name = "lda_model_submission.csv"
+    model_file_name = "lda_model_10.joblib"
 elif quadratic:
-    model_file_name = "qda_model.joblib"
-    submission_output_file_name = "qda_model_submission.csv"
+    model_file_name = "qda_model_11.joblib"
 elif svm:
-    model_file_name = "svm_rbf_model.joblib"
-    submission_output_file_name = "submission.csv"
+    model_file_name = "svm_rbf_model_12.joblib"
 # Test the model
-test_model(model_file_name, submission_output_file_name)
+test_model(model_file_name)
 
 
 # SVC(C=0.03125, cache_size=200, class_weight={0: 20098, 1: 179902}, coef0=0.0,
