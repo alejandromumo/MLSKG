@@ -281,6 +281,14 @@ def plot_residuals(y_pred, y, model):
 
 
 def estimate_test_error(estimator, X, y, k=5):
+    """
+    Estimates the test error using a given estimator. Perform K-Cross validation to obtain a better estimation of the error.
+    :param estimator: estimator to compute the test error.
+    :param X: data's examples/instances
+    :param y: data's target value
+    :param k: number of folds. Must be at least 2 due to scikit-learn restrictions.
+    :return: estimated mean squared error for a given estimator on given test data.
+    """
     kf = KFold(n_splits=k)
     errors = list()
     for train_index, test_index in kf.split(X):
@@ -293,72 +301,81 @@ def estimate_test_error(estimator, X, y, k=5):
     mean_error = np.mean(np.array(errors))
     return mean_error
 
+def load_data_set(filename):
+    """
+    Loads a dataset from a .csv file into a pandas DataFrame structure.
+    :param filename: file's containing the desired dataset
+    :return: DataFrame containing the loaded data
+    """
+    dataset = pd.read_csv(basedir + filename)
+    return dataset
 
-"""
-Load data sets
-"""
-# Train data set
-df_train = pd.read_csv(basedir + "train_houses.csv")
-# Transform data set based on kaggle forums
-df_train, transformations = transform_train_data(df_train)
-X = df_train.drop('SalePrice', axis=1)
-y = df_train['SalePrice']
 
-# Test data set
-df_test = pd.read_csv(basedir + "test.csv")
-# Transform data set, inversely on what was done previously
-df_test = transform_test_data(df_test, transformations[0], df_train.columns)
+if __name__ == '__main__':
+    """
+    Load data sets
+    """
+    # Train data set
+    df_train = load_data_set("train_houses.csv")
+    # Transform data set based on kaggle forums
+    df_train, transformations = transform_train_data(df_train)
+    X = df_train.drop('SalePrice', axis=1)
+    y = df_train['SalePrice']
+    # Test data set
+    df_test = load_data_set("test.csv")
+    # Transform data set, inversely on what was done previously
+    df_test = transform_test_data(df_test, transformations[0], df_train.columns)
 
-"""
-Train models.
-Note: When making the predictions, np.exp() is used on the predictions given by models.
-This is due to performing np.log() on the target while transforming the training and test data.
-"""
-# Ridge
-# Ridge hyper parameter tuning
-ridge_alpha_tuning(X, y, False)
-# training, prediction and submission (optional, uncomment to use)
-alphas = [1, 5, 10, 15]
-for alpha in alphas:
-    ridge = train_ridge(X, y, plot=False, alpha=alpha)
-    ridge_predictions = np.exp(ridge.predict(X=df_test))
-    ridge_predictions = pd.DataFrame(ridge_predictions, columns=["SalePrice"])
-    #wrap_and_submit(ridge_predictions, "ridge regression with alpha: " + str(ridge.alpha))
+    """
+    Train models.
+    Note: When making the predictions, np.exp() is used on the predictions given by models.
+    This is due to performing np.log() on the target while transforming the training and test data.
+    """
+    # Ridge
+    # Ridge hyper parameter tuning
+    ridge_alpha_tuning(X, y, False)
+    # training, prediction and submission (optional, uncomment to use)
+    alphas = [1, 5, 10, 15]
+    for alpha in alphas:
+        ridge = train_ridge(X, y, plot=False, alpha=alpha)
+        ridge_predictions = np.exp(ridge.predict(X=df_test))
+        ridge_predictions = pd.DataFrame(ridge_predictions, columns=["SalePrice"])
+        # wrap_and_submit(ridge_predictions, "ridge regression with alpha: " + str(ridge.alpha))
 
-# Lasso
-# Lasso hyper parameter tuning
-lasso_alpha_tuning(X, y, True)
-# Training, prediction and submission (optional, uncomment to use)
-alphas = [0.01, 1]
-for alpha in alphas:
-    lasso = train_lasso(X, y, plot=False, alpha=alpha)
-    lasso_predictions = np.exp(lasso.predict(X=df_test))
-    lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
-    # wrap_and_submit(lasso_predictions, "lasso regression with alpha: " + str(lasso.alpha))
+    # Lasso
+    # Lasso hyper parameter tuning
+    lasso_alpha_tuning(X, y, False)
+    # Training, prediction and submission (optional, uncomment to use)
+    alphas = [0.01, 1]
+    for alpha in alphas:
+        lasso = train_lasso(X, y, plot=False, alpha=alpha)
+        lasso_predictions = np.exp(lasso.predict(X=df_test))
+        lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
+        # wrap_and_submit(lasso_predictions, "lasso regression with alpha: " + str(lasso.alpha))
 
-# Linear
-# Training, prediction and submission (optional, uncomment to use)
-linear = train_linear(X, y, False)
-linear_predictions = np.exp(linear.predict(X=df_test))
-linear_predictions = pd.DataFrame(linear_predictions, columns=["SalePrice"])
-# wrap_and_submit(linear_predictions, "linear submission")
+    # Linear
+    # Training, prediction and submission (optional, uncomment to use)
+    linear = train_linear(X, y, False)
+    linear_predictions = np.exp(linear.predict(X=df_test))
+    linear_predictions = pd.DataFrame(linear_predictions, columns=["SalePrice"])
+    # wrap_and_submit(linear_predictions, "linear submission")
 
-# Random forests
-# Training, prediction and submission (optional, uncomment to use)
-random_forest = train_random_forest(X, y, False)
-random_forest_predictions = np.exp(random_forest.predict(X=df_test))
-random_forest_predictions = pd.DataFrame(random_forest_predictions, columns=["SalePrice"])
-# wrap_and_submit(random_forest_predictions, type(random_forest).__name__)
+    # Random forests
+    # Training, prediction and submission (optional, uncomment to use)
+    random_forest = train_random_forest(X, y, False)
+    random_forest_predictions = np.exp(random_forest.predict(X=df_test))
+    random_forest_predictions = pd.DataFrame(random_forest_predictions, columns=["SalePrice"])
+    # wrap_and_submit(random_forest_predictions, type(random_forest).__name__)
 
-# SVM Regression
-# Training, prediction and submission (optional, uncomment to use)
-svr = train_svr(X, y, False)
-svr_predictions = np.exp(svr.predict(X=df_test))
-svr_predictions = pd.DataFrame(svr_predictions, columns=["SalePrice"])
-# wrap_and_submit(svr_predictions, type(svr).__name__)
+    # SVM Regression
+    # Training, prediction and submission (optional, uncomment to use)
+    svr = train_svr(X, y, False)
+    svr_predictions = np.exp(svr.predict(X=df_test))
+    svr_predictions = pd.DataFrame(svr_predictions, columns=["SalePrice"])
+    # wrap_and_submit(svr_predictions, type(svr).__name__)
 
-# SVR Linear Regression
-svr = train_svr(X, y, True, linear=True)
-svr_predictions = np.exp(svr.predict(X=df_test))
-svr_predictions = pd.DataFrame(svr_predictions, columns=["SalePrice"])
-# wrap_and_submit(svr_predictions, type(svr).__name__)
+    # SVR Linear Regression
+    svr = train_svr(X, y, True, linear=True)
+    svr_predictions = np.exp(svr.predict(X=df_test))
+    svr_predictions = pd.DataFrame(svr_predictions, columns=["SalePrice"])
+    # wrap_and_submit(svr_predictions, type(svr).__name__)
