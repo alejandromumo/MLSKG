@@ -22,7 +22,6 @@ def transform_train_data(df_train):
     percent = (df_train.isnull().sum()/df_train.isnull().count()).sort_values(ascending=False)
     missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
     dropped_indexes = (missing_data[missing_data['Total'] > 1]).index
-    print(dropped_indexes)
     returned_objects.append(dropped_indexes)
     df_train = df_train.drop(dropped_indexes, 1)
     df_train = df_train.drop(df_train.loc[df_train['Electrical'].isnull()].index)
@@ -56,7 +55,6 @@ def transform_train_data(df_train):
     # convert categorical variable into dummy
     # TODO try customized encoding
     new_df = pd.get_dummies(df_train)
-    print(new_df.columns)
     return new_df, returned_objects
 
 
