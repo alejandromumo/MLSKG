@@ -16,8 +16,8 @@ The competition's challenge is to predict houses prices using regression techniq
 Approximately 1900 houses from Ames, Iowa are available for training, validation and testing. Each house has *"79 explanatory variables describing (almost) every aspect of residential homes"* (from the competition's land page, section *Competition Description*)
 
 ### Work description
-Data pre-processing is made using [Pedro Marcelino's ](http://pmarcelino.com/) approach found in [Comprehensive data exploration with Python](https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!) 
-Data, after being pre-processed, is then used to train several regression models.
+Data pre-processing is made using [Pedro Marcelino's ](http://pmarcelino.com/) approach found in [Comprehensive data exploration with Python](https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!). 
+ The data, after being pre-processed, is used to train several regression models.
 
 #### Models
 - Linear Models
