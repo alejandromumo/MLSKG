@@ -10,7 +10,12 @@ warnings.filterwarnings('ignore')
 
 
 def transform_train_data(df_train):
-    # From: https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!
+    """
+    Pre-process training data using multi-variate statistical analysis.
+    Retrieved from: https://www.kaggle.com/pmarcelino/comprehensive-data-exploration-with-python#Out-liars!
+    :param df_train: DataFrame containing the training data.
+    :return: tuple containing the new data frame and transformations used (data scaler).
+    """
     returned_objects = []
     # dealing with missing data
     total = df_train.isnull().sum().sort_values(ascending=False)
@@ -56,10 +61,16 @@ def transform_train_data(df_train):
 
 
 def transform_test_data(df_test, dropped_features, train_features):
-    # First: drop features and add new ones
-    # Second: apply inverse log (exp) to:
-    #   - GrLivArea
-    #   - TotalBsmtSF
+    """
+    Pre-process test data using the inverse operations performed on previously analysed training data.
+    - Drops features that were dropped from the training dataset
+    - Adds features that were added in the training dataset.
+    - Applies inverse log (exp) to features that were scaled using log operation in the training dataset (GrLivArea, TotalBsmtSF)
+    :param df_test: DataFrame containing the test data.
+    :param dropped_features: list of features that were dropped during training
+    :param train_features: features that currently exist in the training dataset. 
+    :return: DataFrame containing the test data, compatible with the training data, eady to be used.
+    """
     df_test = df_test.drop(dropped_features, 1)
     df_test = df_test.drop(df_test.loc[df_test['Electrical'].isnull()].index)
     df_test.isnull().sum().max()  # just checking that there's no missing data missing...
@@ -79,6 +90,11 @@ def transform_test_data(df_test, dropped_features, train_features):
 
 
 def get_plots_and_analysis(df_train):
+    """
+    Shows plots related with data analysis. Does not perform any writing operations on training data. 
+    Used for analysis only.
+    :param df_train: DataFrame containing the training data.
+    """
     var = 'OverallQual'
     data = pd.concat([df_train['SalePrice'], df_train[var]], axis=1)
     f, ax = plt.subplots(figsize=(8, 6))
