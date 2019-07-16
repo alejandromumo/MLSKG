@@ -1,9 +1,12 @@
 from multivariate_analysis import *
 import pandas as pd
 import os
+import sys
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
+import time
+import joblib
 # Import models
 from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
@@ -11,6 +14,7 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.svm import SVR, LinearSVR
+import xgboost as xgb
 
 basedir = "C:/Users/ManuelCosta/Documents/GitHub/MLSKG/house-prices-advanced-regression-techniques/"
 command = "kaggle competitions submit -c house-prices-advanced-regression-techniques -f submission.csv -m "
@@ -60,7 +64,7 @@ def train_lasso(X, y, plot=False, alpha=0.01):
     :param plot: either true or false. Controls if plots are shown while training this model.
     :return: trained Lasso model
     """
-    estimator = Ridge(alpha=alpha)
+    estimator = Lasso(alpha=alpha)
     estimated_test_error = estimate_test_error(estimator, X, y)
     print("Estimated test error for Lasso  model (alpha={}): {}".format(alpha, estimated_test_error))
     model = Lasso(alpha=alpha)
@@ -152,47 +156,38 @@ def train_linear(X, y, plot=False):
     return model
 
 
-def train_random_forest(X, y, plot=False):
-    """
-    Trains a Random Forest Model.
-    :param X: X of the current dataset
-    :param y: target of the current dataset
-    :param plot: either true or false. Controls if plots are shown while training this model.
-    :return: trained Random Forest model
-    """
-    print("Training Random Forest")
+def random_forest_hp_tuning(estimator, X, y, nj):
     # Number of trees in random forest
-    # n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
+    n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
     # # Number of features to consider at every split
-    # max_features = ['auto', 'sqrt']
+    max_features = ['auto', 'sqrt']
     # # Maximum number of levels in tree
-    # max_depth = [int(x) for x in np.linspace(10, 110, num=11)]
-    # max_depth.append(None)
+    max_depth = [int(x) for x in np.linspace(10, 110, num=11)]
+    max_depth.append(None)
     # # Minimum number of samples required to split a node
-    # min_samples_split = [2, 5, 10]
+    min_samples_split = [2, 5, 10]
     # # Minimum number of samples required at each leaf node
-    # min_samples_leaf = [1, 2, 4]
+    min_samples_leaf = [1, 2, 4]
     # # Method of selecting samples for training each tree
-    # bootstrap = [True, False]
+    bootstrap = [True, False]
     # # Create the random grid
-    # random_grid = {'n_estimators': n_estimators,
-    #                'max_features': max_features,
-    #                'max_depth': max_depth,
-    #                'min_samples_split': min_samples_split,
-    #                'min_samples_leaf': min_samples_leaf,
-    #                'bootstrap': bootstrap}
+    random_grid = {'n_estimators': n_estimators,
+                   'max_features': max_features,
+                   'max_depth': max_depth,
+                   'min_samples_split': min_samples_split,
+                   'min_samples_leaf': min_samples_leaf,
+                   'bootstrap': bootstrap}
     # Use the random grid to search for best hyperparameters
     # First create the base model to tune
     # Random search of parameters, using 3 fold cross validation,
     # search across 100 different combinations, and use all available cores
-    # rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
-    #                               random_state=42, scoring='neg_mean_squared_error')
+    rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
+        random_state=42, scoring='neg_mean_squared_error', n_jobs=nj)
 
     # Fit the random search model
-    # rf_random.fit(X, y)
-
+    rf_random.fit(X, y)
     # Best model from Random Grid Search CV
-    # print(rf_random.best_params_)
+    print(rf_random.best_params_)
     # {'n_estimators': 400,
     # 'min_samples_split': 2,
     # 'min_samples_leaf': 1,
@@ -202,15 +197,39 @@ def train_random_forest(X, y, plot=False):
     # print(rf_random.best_score_)
     # 0.018950937597094954
 
-    # K-Cross validation to estimate test error
-    # estimator = RandomForestRegressor(n_estimators=400, min_samples_split=2, min_samples_leaf=1, max_features='sqrt',
-    #                              max_depth=None, bootstrap=False)
-    estimator = ExtraTreesRegressor()
+
+def xgb_hp_tuning(estimator, X,y, nj):
+    """
+    TODO
+    :param estimator:
+    :param X:
+    :param y:
+    :param nj:
+    :return:
+    """
+    pass
+
+
+def train_random_forest(X, y, plot=False, ET=False, nj=None):
+    """
+    Trains a Random Forest Model.
+    :param X: X of the current dataset
+    :param y: target of the current dataset
+    :param plot: either true or false. Controls if plots are shown while training this model.
+    :return: trained Random Forest model
+    """
+    print("Training Random Forest")
+    if(ET):
+        estimator = ExtraTreesRegressor(n_jobs=nj)
+        model = ExtraTreesRegressor(n_jobs=nj)
+    else:
+        estimator = RandomForestRegressor(n_estimators=400, min_samples_split=2, min_samples_leaf=1, max_features='sqrt', max_depth=None, bootstrap=False, n_jobs=nj)
+        model = RandomForestRegressor(n_estimators=400, min_samples_split=2, min_samples_leaf=1, max_features='sqrt', max_depth=None, bootstrap=False, n_jobs=nj)
+
     estimated_test_error = estimate_test_error(estimator, X, y)
     model_name = type(estimator).__name__
     print("Estimated test error for {} model : {}".format(model_name, estimated_test_error))
     # Train RF Regressor with the whole data set
-    model = ExtraTreesRegressor()
     model.fit(X, y)
     y_pred = model.predict(X)
     rmse = np.sqrt(mean_squared_error(y, y_pred))
@@ -239,6 +258,27 @@ def train_svr(X, y, plot=False, linear=False):
     model_name = type(estimator).__name__
     estimated_test_error = estimate_test_error(estimator, X, y)
     print("Estimated test error for {} model : {}".format(model_name, estimated_test_error))
+    model.fit(X, y)
+    y_pred = model.predict(X)
+    rmse = np.sqrt(mean_squared_error(y, y_pred))
+    print("Training error for {} model : {}".format(model_name, rmse))
+    if plot:
+        plot_residuals(y_pred, y, model_name)
+    return model
+
+
+def train_xgb(X, y, plot=False):
+    """
+    TODO
+    model = xgb.XGBRegressor()
+    """
+    param_dist = {'n_estimators': 400,
+                  'n_jobs': -1}
+    estimator = xgb.XGBRegressor(**param_dist)
+    model_name = type(estimator).__name__
+    estimated_test_error = estimate_test_error(estimator, X, y)
+    print("Estimated test error for {} model : {}".format(model_name, estimated_test_error))
+    model = xgb.XGBRegressor(**param_dist)
     model.fit(X, y)
     y_pred = model.predict(X)
     rmse = np.sqrt(mean_squared_error(y, y_pred))
@@ -301,6 +341,7 @@ def estimate_test_error(estimator, X, y, k=5):
     mean_error = np.mean(np.array(errors))
     return mean_error
 
+
 def load_data_set(filename):
     """
     Loads a dataset from a .csv file into a pandas DataFrame structure.
@@ -360,6 +401,13 @@ if __name__ == '__main__':
     linear_predictions = pd.DataFrame(linear_predictions, columns=["SalePrice"])
     # wrap_and_submit(linear_predictions, "linear submission")
 
+    # XGB
+    xgb = train_xgb(X, y, True)
+    xgb_predictions = np.exp(xgb.predict(data=df_test[X.columns]))
+    xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
+    # wrap_and_submit(xgb_predictions, type(xgb).__name__)
+    sys.exit(0)
+
     # Random forests
     # Training, prediction and submission (optional, uncomment to use)
     random_forest = train_random_forest(X, y, False)
@@ -367,7 +415,14 @@ if __name__ == '__main__':
     random_forest_predictions = pd.DataFrame(random_forest_predictions, columns=["SalePrice"])
     # wrap_and_submit(random_forest_predictions, type(random_forest).__name__)
 
-    # SVM Regression
+    # Extra Trees
+    # Training, prediction and submission (optional, uncomment to use)
+    random_forest = train_random_forest(X, y, False, ET=True)
+    random_forest_predictions = np.exp(random_forest.predict(X=df_test))
+    random_forest_predictions = pd.DataFrame(random_forest_predictions, columns=["SalePrice"])
+    # wrap_and_submit(random_forest_predictions, type(random_forest).__name__)
+
+    # Support Vector Regressor
     # Training, prediction and submission (optional, uncomment to use)
     svr = train_svr(X, y, False)
     svr_predictions = np.exp(svr.predict(X=df_test))
@@ -375,7 +430,7 @@ if __name__ == '__main__':
     # wrap_and_submit(svr_predictions, type(svr).__name__)
 
     # SVR Linear Regression
-    svr = train_svr(X, y, True, linear=True)
+    svr = train_svr(X, y, False, linear=True)
     svr_predictions = np.exp(svr.predict(X=df_test))
     svr_predictions = pd.DataFrame(svr_predictions, columns=["SalePrice"])
     # wrap_and_submit(svr_predictions, type(svr).__name__)
