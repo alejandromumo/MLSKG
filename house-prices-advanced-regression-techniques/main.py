@@ -181,6 +181,7 @@ def random_forest_hp_tuning(estimator, X, y, nj):
     # First create the base model to tune
     # Random search of parameters, using 3 fold cross validation,
     # search across 100 different combinations, and use all available cores
+    rf = RandomForestRegressor()
     rf_random = RandomizedSearchCV(estimator=rf, param_distributions=random_grid, n_iter=100, cv=3, verbose=2,
         random_state=42, scoring='neg_mean_squared_error', n_jobs=nj)
 
@@ -198,8 +199,22 @@ def random_forest_hp_tuning(estimator, X, y, nj):
     # 0.018950937597094954
 
 
-def xgb_hp_tuning(estimator, X,y, nj):
+def xgb_hp_tuning(X, y, nj=-1):
     """
+    From docs https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html :
+
+    There are in general two ways that you can control overfitting in XGBoost:
+
+    The first way is to directly control model complexity.
+
+        This includes max_depth, min_child_weight and gamma.
+
+    The second way is to add randomness to make training robust to noise.
+
+        This includes subsample and colsample_bytree.
+
+        You can also reduce stepsize eta. Remember to increase num_round when you do so.
+
     TODO
     :param estimator:
     :param X:
@@ -207,7 +222,60 @@ def xgb_hp_tuning(estimator, X,y, nj):
     :param nj:
     :return:
     """
+    print("Doing stuff")
+    max_depth = [int(x) for x in np.arange(start=10, stop=100, step=10)] #4
+    min_child_weight = [int(x) for x in np.arange(start=1, stop=4, step=1)]#3
+    gamma = [int(x) for x in np.arange(start=0, stop=0.9, step=0.1)] #4
+    n_estimators = [int(x) for x in np.arange(start=100, stop=1000, step=10)]#4
+    random_grid = {'max_depth': max_depth,
+                   'min_child_weight': min_child_weight,
+                   'gamma': gamma,
+                   'n_estimators': n_estimators}
+    xgb_model = xgb.XGBRegressor(n_jobs=-1)
+    grid_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=random_grid, n_iter=100, cv=2, verbose=2,
+                                     random_state=42, scoring='neg_mean_squared_error', n_jobs=1)
+    grid_search.fit(X, y)
+    print(grid_search.best_params_)
+    scores = grid_search.cv_results_['mean_test_score']
+    params_combinations = grid_search.cv_results_['params']
+    i = 0
+    my_d = list()
+    for combination in params_combinations:
+        tmp = list(combination.values())
+        tmp.append(scores[i])
+        my_d.append(tmp)
+        i += 1
+    scores = np.array(my_d)
+    i = 1
+    for k in list(random_grid.keys()):
+        p_index = get_param_index(k, params_combinations)
+        df = get_df_parameter(p_index, random_grid[k], scores)
+        x = df[:, 0]
+        y = df[:, 1]
+        plt.subplot(4, 2, i)
+        plt.plot(x, y)
+        plt.title(k)
+        plt.ylabel("score")
+        i += 1
+    plt.show()
+    print("ok")
+    # {'n_estimators': 860, 'min_child_weight': 3, 'max_depth': 10, 'gamma': 0}
+    # 0.016546847765073678
     pass
+
+
+def get_df_parameter(index, combinations_param, scores):
+    result = list()
+    for ne in combinations_param:
+        s = scores[scores[:, index] == ne, 4]
+        result.append([ne, np.mean(s)])
+    df = np.array(result)
+    return df
+
+
+def get_param_index(param, combinations_param):
+    index = list(combinations_param[0].keys()).index(param)
+    return index
 
 
 def train_random_forest(X, y, plot=False, ET=False, nj=None):
@@ -366,7 +434,8 @@ if __name__ == '__main__':
     df_test = load_data_set("test.csv")
     # Transform data set, inversely on what was done previously
     df_test = transform_test_data(df_test, transformations[0], df_train.columns)
-
+    xgb_hp_tuning(X, y)
+    sys.exit(0)
     """
     Train models.
     Note: When making the predictions, np.exp() is used on the predictions given by models.
