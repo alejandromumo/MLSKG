@@ -32,10 +32,6 @@ def transform_train_data(df_train):
     returned_objects.append(scaler)
     # low_range = saleprice_scaled[saleprice_scaled[:, 0].argsort()][:10]
     # high_range = saleprice_scaled[saleprice_scaled[:, 0].argsort()][-10:]
-    #print('outer range (low) of the distribution:')
-    #print(low_range)
-    #print('\nouter range (high) of the distribution:')
-    #print(high_range)
     # deleting points
     df_train = df_train.drop(df_train[df_train['Id'] == 1299].index)
     df_train = df_train.drop(df_train[df_train['Id'] == 524].index)
@@ -120,7 +116,7 @@ def get_plots_and_analysis(df_train):
     sns.set()
     # Strongly correlated variables
     cols = ['SalePrice', 'OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt']
-    sns.pairplot(df_train[cols], size = 2.5)
+    sns.pairplot(df_train[cols], size=2.5)
     plt.show()
     # check missing data
     total = df_train.isnull().sum().sort_values(ascending=False)
@@ -163,11 +159,11 @@ def get_plots_and_analysis(df_train):
     # data transformation
     df_train['GrLivArea'] = np.log(df_train['GrLivArea'])
     # transformed histogram and normal probability plot
-    sns.distplot(df_train['GrLivArea'], fit=norm);
+    sns.distplot(df_train['GrLivArea'], fit=norm)
     fig = plt.figure()
     res = stats.probplot(df_train['GrLivArea'], plot=plt)
     # histogram and normal probability plot
-    sns.distplot(df_train['TotalBsmtSF'], fit=norm);
+    sns.distplot(df_train['TotalBsmtSF'], fit=norm)
     fig = plt.figure()
     res = stats.probplot(df_train['TotalBsmtSF'], plot=plt)
     # create column for new variable (one is enough because it's a binary categorical feature)
@@ -185,5 +181,194 @@ def get_plots_and_analysis(df_train):
     plt.scatter(df_train['GrLivArea'], df_train['SalePrice'])
     # scatter plot
     plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_train['TotalBsmtSF']>0]['SalePrice'])
-    # convert categorical variable into dummy
-    df_train = pd.get_dummies(df_train)
+
+
+def my_analysis(df_train):
+    """
+    TODO
+    :param df_train:
+    :return:
+    """
+    sns.set()
+    # fig = plt.figure()
+    # # sns.distplot(df_train["SalePrice"], fit=stats.johnsonsb, kde=False, fit_kws={'color': 'green'})
+    # sns.distplot(df_train["SalePrice"], fit=stats.lognorm, kde=False, fit_kws={'color': 'blue'},
+    #              axlabel="Sale Price Distribution (log fit)")
+    # plt.show(block=False)
+    # fig = plt.figure()
+    # df_train["SalePrice"] = np.log(df_train["SalePrice"])
+    # sns.distplot(df_train["SalePrice"], fit=stats.lognorm, kde=False, fit_kws={'color': 'blue'},
+    #              axlabel="Log Sale Price Distribution")
+    # plt.show()
+    # input()
+    cols = ['OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt', 'Fireplaces']
+    # Distributions of selected features (fit=log)
+    # for c in cols:
+    #     fig = plt.figure()
+    #     sns.distplot(df_train[c], fit=stats.lognorm, kde=False, fit_kws={'color': 'blue'},
+    #                  axlabel="{} Distribution (log fit)".format(c))
+    #     plt.show(block=False)
+    # plt.show()
+    # input()
+    # # Distribution of selected features (fit=norm)
+    # for c in cols:
+    #     fig = plt.figure()
+    #     sns.distplot(df_train[c], fit=stats.norm, kde=False, fit_kws={'color': 'blue'},
+    #                  axlabel="{} Distribution (norm fit)".format(c))
+    #     plt.show(block=False)
+    # # Scatter plots of selected features
+    # plt.show()
+    # input()
+    # cols_scatter = ['GrLivArea', 'TotalBsmtSF', 'YearBuilt']
+    # for c in cols_scatter:
+    #     fig = plt.figure()
+    #     sns.scatterplot(x=c, y='SalePrice', data=pd.concat([df_train[c], df_train['SalePrice']], axis=1))
+    #     plt.show(block=False)
+    # # Boxplot of selected features
+    # cols_box_plot = ['OverallQual', 'GarageCars', 'FullBath', 'Fireplaces']
+    # for c in cols_box_plot:
+    #     fig = plt.figure()
+    #     sns.boxplot(x=c, y='SalePrice', data=pd.concat([df_train[c], df_train['SalePrice']], axis=1))
+    #     plt.show(block=False)
+    # print("")
+
+    #remove_outliers(df_train)
+    #deal_missing_data(df_train)
+    categorical_to_ordinal_features(df_train)
+
+def remove_outliers(df_train):
+    """
+    Removes outliers, in place, from a given data frame.
+    After analysing the scatter plot of the features with the SalePrice, the following cases were detected:
+    - GrLivArea : i=523 and i=1298 are obvious outliers
+    - TotalBsmtSF: i=1298 is an outlier
+                   i=440, 523, 496, 332 might be outliers
+    :param df_train: Train data frame
+    """
+    indexes = [523, 1298]
+    df_train.drop(axis=0, labels=indexes, inplace=True)
+
+
+def deal_missing_data(df_train):
+    """
+    Deals with missing data (NaN). Changes are made in place, does not return a new data frame.
+    For categorical features:
+        - Some features have NaN as a possible value. Thus, they are not missing values.
+        In such cases, values are changed to 'None'
+        - Features that have in fact missing values are filled with the mode.
+    For numerical features:
+        - Missing values are filled the feature's median value.
+    :param df_train: Train data frame
+    """
+    total = df_train.isnull().sum().sort_values(ascending=False)
+    percent = (df_train.isnull().sum()/df_train.isnull().count()).sort_values(ascending=False)
+    missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
+    missing_data = missing_data[missing_data['Total'] > 0]
+    # Fill rows that have missing data with the median value of the feature
+    cols = ['LotFrontage', 'MasVnrArea', 'GarageYrBlt']
+    for c in cols:
+        median = np.nanmedian(df_train[c])
+        df_train[c].fillna(median, inplace=True)
+        assert(df_train[c].isna().sum() == 0)
+    # Fill rows that have missing data with specific values
+    df_train['MasVnrType'].fillna('None', inplace=True)
+    df_train['Electrical'].fillna('SBrkr', inplace=True)
+    # Fill rows that have missing data with None or the median (numerical features)
+    cols = ['MiscFeature', 'Alley', 'Fence', 'FireplaceQu', 'GarageCond', 'GarageType', 'GarageFinish',
+            'GarageQual', 'BsmtExposure', 'BsmtFinType2', 'BsmtFinType1', 'BsmtCond', 'BsmtQual']
+    for c in cols:
+        if df_train.dtypes[c] == object:
+            df_train[c].fillna('None', inplace=True)
+    # Drop PoolQC because almost 100% has no information regarding it.
+    #   The feature PoolArea represents most of the feature PoolQC.
+    df_train.drop(['PoolQC'], axis=1, inplace=True)
+    assert(df_train.isna().any().all() == False)
+    sns.boxplot(x='LandSlope', y='SalePrice', data=pd.concat([df_train['LandSlope'], df_train['SalePrice']], axis=1))
+    plt.show()
+    print()
+
+
+def combine_features(df_train):
+    # TODO
+    pass
+
+
+def categorical_to_ordinal_features(df_train):
+    # TODO
+    mapper = {'LotShape': {'Reg': 3, 'IR1': 2, 'IR2': 1, 'IR3': 0},
+              'LandContour': {'Lvl': 1, 'Bnk': 0, 'HLS': 3, 'Low': 2},
+              'LandSlope': {'Mod': 2, 'Gtl': 1, 'Sev': 0},
+              'ExterQual': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
+              'ExterCond': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
+              'BsmtQual': {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'None': 0},
+              'BsmtCond': {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'None': 0},
+              'BsmtExposure': {'Gd': 4, 'Av': 3, 'Mn': 2, 'No': 1, 'None': 0},
+              'BsmtFinType1': {'GLQ': 6, 'ALQ': 5, 'BLQ': 4, 'Rec': 3, 'LwQ': 2, 'Unf': 1, 'None': 0},
+              'BsmtFinType2': {'GLQ': 6, 'ALQ': 5, 'BLQ': 4, 'Rec': 3, 'LwQ': 2, 'Unf': 1, 'None': 0},
+              'HeatingQC': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
+              'CentralAir': {'Y': 1, 'N': 0},
+              'KitchenQual': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
+              }
+    # Functional
+    # FireplaceQu
+    # GarageFinish
+    # GarageQual
+    # GarageCond
+    # Fence
+    for k in list(mapper.keys()):
+        df_train[k].replace(mapper.get(k), inplace=True)
+    print()
+    pass
+
+
+def transform_numerical_features(df_train):
+    # TODO
+    # apply log, scaling to features
+    pass
+
+'''
+Notes about data:
+---
+Based on distributions analysis:
+- SalePrice follows a lognorm or johnsons SB distribution.
+- SalePrice and GrLivArea have a high positive correlation. 
+    Two points may be outliers (GrLivArea > 4000, SalePrice < 12.5)
+- SalePrice and TotalBsmtSF have a high positive correlation. 
+    One data point seems like an outlier (TaoalBsmtSF > 6000, might be information). 
+    4 points may be outliers (TotalBsmtSF > 3000)
+- OverallQual, GarageCars maybe log
+- OverallQual, GarageCars maybe norm
+- GrLivArea follows a norm distribution
+- TotalBsmtSF follows a norm distribution, slightly left skewed
+- YearBuilt follows a norm distribution, slightly right skewed
+
+---
+Dealing with missing data:
+The following features have missing data:
+    'PoolQC'            - NA means no pool 
+    'MiscFeature'       - NA means no misc feature
+    'Alley'             - NA means no alley access
+    'Fence'             - NA means no fence
+    'FireplaceQu'       - NA means no fireplace (same as Fireplaces=0)
+    'GarageCond'        - NA means no garage
+    'GarageType'        - NA means no garage
+    'GarageYrBlt'       - NA means no garage
+    'GarageFinish'      - NA means no garage
+    'GarageQual'        - NA means no garage
+    'BsmtExposure'      - NA means no basement (there is one extra basement NA in Exposure and Fin Type 2)
+    'BsmtFinType2'      - NA means no basement
+    'BsmtFinType1'      - NA means no basement
+    'BsmtCond'          - NA means no basement
+    'BsmtQual'          - NA means no basement 
+    'MasVnrArea'        - NA is missing data (X)
+    'MasVnrType'        - NA is missing data (X)
+    'Electrical'        - NA is missing data (X)
+    'LotFrontage'       - NA is missing data (X)
+---
+Dealing with outliers:
+- GrLivArea : i=523 and i=1298 are outliers
+- TotalBsmtSF: i=1298 is an outlier
+               i=440, 523, 496, 332 might be outliers
+'''
+
+
