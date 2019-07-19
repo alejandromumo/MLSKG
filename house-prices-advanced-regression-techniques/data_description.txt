@@ -389,7 +389,7 @@ Electrical: Electrical system
        FuseF	60 AMP Fuse Box and mostly Romex wiring (Fair)
        FuseP	60 AMP Fuse Box and mostly knob & tube wiring (poor)
        Mix	Mixed
-       Note: Nominal feature. Could be Ordinal. SBrkr represents 98% of the feature.
+       Note: Nominal feature
 		
 1stFlrSF: First Floor square feet
  
@@ -560,7 +560,7 @@ SaleType: Type of sale
        ConLI	Contract Low Interest
        ConLD	Contract Low Down
        Oth	Other
-       Note: Nominal Feature. Could be Ordinal. Encode using OneHot.
+       Note: Nominal Feature
        WD represents 98% of the feature.
 		
 SaleCondition: Condition of sale
