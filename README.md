@@ -33,21 +33,30 @@ Data pre-processing is made using [Pedro Marcelino's ](http://pmarcelino.com/) a
 - Boosting
   * in progress
 ### Results
-| Model  | Estimated test error | Training rmse | Real score | #  | Notes                                                                                                          |
-|--------|----------------------|---------------|------------|----|----------------------------------------------------------------------------------------------------------------|
-| Linear | 0.120908904          | 0.093253489   | 0.59279    | 1  | Default                                                                                                        |
-| RF     | 0.145722203          | 0.06105498    | 0.18264    | 2  | Default                                                                                                        |
-| RF     | 0.134576161          | 0.061981003   | 0.18385    | 3  | n_estimators=400, min_samples_split=2, min_samples_leaf=1, max_features='sqrt',max_depth=None, bootstrap=False |
-| Ridge  | 0.116345852          | 0.094236802   | 0.43935    | 4  | alpha=1 (Default)                                                                                              |
-| Ridge  | 0.113571525          | 0.096893286   | 0.32987    | 5  | alpha=5                                                                                                        |
-| Ridge  | 0.113392101          | 0.098962901   | 0.29065    | 6  | alpha=10                                                                                                       |
-| Ridge  | 0.11358832           | 0.100400247   | 0.26921    | 7  | alpha=15                                                                                                       |
-| Lasso  | 0.116345852          | 0.167788121   | 0.18687    | 8  | alpha=1(Default)                                                                                               |
-| Lasso  | 0.120819004          | 0.128345118   | 0.13698    | 9  | alpha=0.01                                                                                                     |
-| ET     | 0.142216183          | 1.20E-05      | 0.20535    | 10 | Default                                                                                                        |
-| ET     | 0.131307263          | 1.35E-05      | 0.1949     | 11 | n_estimators=400                                                                                               |
-| SVR    | 0.399700654          | 0.100100785   | 0.41927    | 12 | Default                                                                                                        |
-| LSVR   | 0.20549275           | 0.187193702   |            | 13 | Default                                                                                                        |
+| Model  | Estimated test error | Training rmse | Real score | #  | Notes                                                                                                                      |
+|--------|----------------------|---------------|------------|----|----------------------------------------------------------------------------------------------------------------------------|
+| Linear | 0.120908904          | 0.093253489   | 0.59279    | 1  | Default                                                                                                                    |
+| RF     | 0.145722203          | 0.06105498    | 0.18264    | 2  | Default                                                                                                                    |
+| RF     | 0.134576161          | 0.061981003   | 0.18385    | 3  | n_estimators=400, min_samples_split=2, min_samples_leaf=1, max_features='sqrt',max_depth=None, bootstrap=False             |
+| Ridge  | 0.116345852          | 0.094236802   | 0.43935    | 4  | alpha=1 (Default)                                                                                                          |
+| Ridge  | 0.113571525          | 0.096893286   | 0.32987    | 5  | alpha=5                                                                                                                    |
+| Ridge  | 0.113392101          | 0.098962901   | 0.29065    | 6  | alpha=10                                                                                                                   |
+| Ridge  | 0.11358832           | 0.100400247   | 0.26921    | 7  | alpha=15                                                                                                                   |
+| Lasso  | 0.116345852          | 0.167788121   | 0.18687    | 8  | alpha=1(Default)                                                                                                           |
+| Lasso  | 0.120819004          | 0.128345118   | 0.13698    | 9  | alpha=0.01                                                                                                                 |
+| ET     | 0.142216183          | 1.20E-05      | 0.20535    | 10 | Default                                                                                                                    |
+| ET     | 0.131307263          | 1.35E-05      | 0.1949     | 11 | n_estimators=400                                                                                                           |
+| SVR    | 0.399700654          | 0.100100785   | 0.41927    | 12 | Default                                                                                                                    |
+| LSVR   | 0.20549275           | 0.187193702   |            | 13 | Default                                                                                                                    |
+| XGB    | 0.119230251          | 0.053223098   | 0.13992    | 14 | n_estimators=400                                                                                                           |
+| XGB    | 0.122424538          | 0.022773584   | 0.13458    | 15 | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100                                                     |
+| XGB    | 0.122356405          | 0.019058915   | 0.13455    | 16 | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 110                                                     |
+| XGB    | 0.122323862          | 0.016552849   | 0.13454    | 17 | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 120                                                     |
+| XGB    | 0.122356414          | 0.014266287   | 0.1344     | 18 | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 130                                                     |
+| XGB    | 0.121933305          | 0.034796934   | 0.13143    | 19 | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100, subsample:0.6, colsample_bytree:0.6                |
+| XGB    | 0.148958117          | 0.107965568   | 0.14948    |    | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100, subsample:0.6, colsample_bytree:0.6, reg_lamba:100 |
+| XGB    | 0.229409825          | 0.192657999   | 0.21862    |    | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100, subsample:0.6, colsample_bytree:0.6, reg_lamba:500 |
+| XGB    | 0.136947548          | 0.088152734   | 0.14723    |    | gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100, subsample:0.6, colsample_bytree:0.6, reg_lamba:50  |
 
 ### Future Work
 - Some models were briefly analysed such as Support Vector Machines and Extra trees. Their hyper-parameters combinations were not deeply explored and there is work to be done in that aspect.
