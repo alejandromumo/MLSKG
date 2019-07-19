@@ -5,14 +5,12 @@ import sys
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-import time
-import joblib
 # Import models
 from sklearn.linear_model import Ridge, Lasso, LinearRegression
 from sklearn.ensemble import RandomForestRegressor, ExtraTreesRegressor
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
 from sklearn.svm import SVR, LinearSVR
 import xgboost as xgb
 
@@ -199,9 +197,12 @@ def random_forest_hp_tuning(estimator, X, y, nj):
     # 0.018950937597094954
 
 
-def xgb_hp_tuning(X, y, nj=-1):
+def xgb_hp_tuning(X, y):
     """
-    From docs https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html :
+    Extreme boosted tree's hyper parameters tuning. Uses GridSearchCV from the Sci-kit learning library. The parameters
+    that are tested were chosen based on the following information from the XGBoost documentation:
+
+    https://xgboost.readthedocs.io/en/latest/tutorials/param_tuning.html
 
     There are in general two ways that you can control overfitting in XGBoost:
 
@@ -215,27 +216,25 @@ def xgb_hp_tuning(X, y, nj=-1):
 
         You can also reduce stepsize eta. Remember to increase num_round when you do so.
 
-    TODO
-    :param estimator:
-    :param X:
-    :param y:
-    :param nj:
-    :return:
+    :param X: X of the current dataset
+    :param y: target of the current dataset
     """
-    print("Doing stuff")
-    max_depth = [int(x) for x in np.arange(start=10, stop=100, step=10)] #4
-    min_child_weight = [int(x) for x in np.arange(start=1, stop=4, step=1)]#3
-    gamma = [int(x) for x in np.arange(start=0, stop=0.9, step=0.1)] #4
-    n_estimators = [int(x) for x in np.arange(start=100, stop=1000, step=10)]#4
-    random_grid = {'max_depth': max_depth,
+    max_depth = [int(x) for x in np.arange(start=10, stop=100, step=20)]
+    min_child_weight = [int(x) for x in np.arange(start=1, stop=4, step=1)]
+    gamma = [int(x) for x in np.arange(start=0, stop=0.3, step=0.1)]
+    n_estimators = [int(x) for x in np.arange(start=100, stop=1000, step=10)]
+    grid = {'max_depth': max_depth,
                    'min_child_weight': min_child_weight,
                    'gamma': gamma,
                    'n_estimators': n_estimators}
     xgb_model = xgb.XGBRegressor(n_jobs=-1)
-    grid_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=random_grid, n_iter=100, cv=2, verbose=2,
-                                     random_state=42, scoring='neg_mean_squared_error', n_jobs=1)
+    # grid_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=grid, n_iter=100, cv=3, verbose=2,
+    #                                  random_state=42, scoring='neg_mean_squared_error', n_jobs=1)
+    grid_search = GridSearchCV(estimator=xgb_model, param_grid=grid, cv=3, verbose=2, scoring='neg_mean_squared_error',
+                               n_jobs=1)
     grid_search.fit(X, y)
     print(grid_search.best_params_)
+    print(grid_search.best_score_)
     scores = grid_search.cv_results_['mean_test_score']
     params_combinations = grid_search.cv_results_['params']
     i = 0
@@ -247,9 +246,9 @@ def xgb_hp_tuning(X, y, nj=-1):
         i += 1
     scores = np.array(my_d)
     i = 1
-    for k in list(random_grid.keys()):
+    for k in list(grid.keys()):
         p_index = get_param_index(k, params_combinations)
-        df = get_df_parameter(p_index, random_grid[k], scores)
+        df = get_df_parameter(p_index, grid[k], scores)
         x = df[:, 0]
         y = df[:, 1]
         plt.subplot(4, 2, i)
@@ -258,10 +257,14 @@ def xgb_hp_tuning(X, y, nj=-1):
         plt.ylabel("score")
         i += 1
     plt.show()
-    print("ok")
-    # {'n_estimators': 860, 'min_child_weight': 3, 'max_depth': 10, 'gamma': 0}
-    # 0.016546847765073678
-    pass
+    # {'n_estimators': 860, 'min_child_weight': 3, 'max_depth': 10, 'gamma': 0}, 0.016546847765073678
+    # {'n_estimators': 690, 'min_child_weight': 2, 'max_depth': 10, 'gamma': 0}
+    #
+    # {'n_estimators': 120, 'min_child_weight': 3, 'max_depth': 10, 'gamma': 0}, -0.01650642034698381
+    # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 120}, -0.01650642034698381
+    # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 130}, -0.01649072406422703
+    # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 110}, -0.016452422168526753
+    # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100}, -0.01639837965635243
 
 
 def get_df_parameter(index, combinations_param, scores):
@@ -337,11 +340,20 @@ def train_svr(X, y, plot=False, linear=False):
 
 def train_xgb(X, y, plot=False):
     """
-    TODO
-    model = xgb.XGBRegressor()
+    Trains a boosted tree regressor using the XGBoost library (https://xgboost.readthedocs.io/en/).
+    :param X: X of the current dataset
+    :param y: target of the current dataset
+    :param plot: either true or false. Controls if plots are shown while training this model.
+    :return: trained extreme boosted tree model
     """
-    param_dist = {'n_estimators': 400,
-                  'n_jobs': -1}
+    param_dist = {'gamma': 0,
+                  'max_depth': 10,
+                  'min_child_weight': 3,
+                  'n_estimators': 100,
+                  'n_jobs': -1,
+                  'subsample': 0.6,
+                  'colsample_bytree': 0.6}
+
     estimator = xgb.XGBRegressor(**param_dist)
     model_name = type(estimator).__name__
     estimated_test_error = estimate_test_error(estimator, X, y)
@@ -427,6 +439,7 @@ if __name__ == '__main__':
     # Train data set
     df_train = load_data_set("train_houses.csv")
     # Transform data set based on kaggle forums
+    my_analysis(df_train)
     df_train, transformations = transform_train_data(df_train)
     X = df_train.drop('SalePrice', axis=1)
     y = df_train['SalePrice']
@@ -434,16 +447,27 @@ if __name__ == '__main__':
     df_test = load_data_set("test.csv")
     # Transform data set, inversely on what was done previously
     df_test = transform_test_data(df_test, transformations[0], df_train.columns)
-    xgb_hp_tuning(X, y)
-    sys.exit(0)
     """
     Train models.
     Note: When making the predictions, np.exp() is used on the predictions given by models.
     This is due to performing np.log() on the target while transforming the training and test data.
     """
+    sys.exit(0)
+    # XGB
+    # XGB hyper parameter tuning
+    # xgb_hp_tuning(X, y)
+    # training, prediction and submission
+    xgb_model = train_xgb(X, y, False)
+    best_i = np.argpartition(xgb_model.feature_importances_, -5)[-5:]
+    features = [(df_train.columns[i], xgb_model.feature_importances_[i]) for i in best_i]
+    for f in features:
+        print(f)
+    xgb_predictions = np.exp(xgb_model.predict(data=df_test[X.columns]))
+    xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
+    # wrap_and_submit(xgb_predictions, type(xgb_model).__name__)
     # Ridge
     # Ridge hyper parameter tuning
-    ridge_alpha_tuning(X, y, False)
+    # ridge_alpha_tuning(X, y, False)
     # training, prediction and submission (optional, uncomment to use)
     alphas = [1, 5, 10, 15]
     for alpha in alphas:
@@ -454,7 +478,7 @@ if __name__ == '__main__':
 
     # Lasso
     # Lasso hyper parameter tuning
-    lasso_alpha_tuning(X, y, False)
+    # lasso_alpha_tuning(X, y, False)
     # Training, prediction and submission (optional, uncomment to use)
     alphas = [0.01, 1]
     for alpha in alphas:
@@ -469,13 +493,6 @@ if __name__ == '__main__':
     linear_predictions = np.exp(linear.predict(X=df_test))
     linear_predictions = pd.DataFrame(linear_predictions, columns=["SalePrice"])
     # wrap_and_submit(linear_predictions, "linear submission")
-
-    # XGB
-    xgb = train_xgb(X, y, True)
-    xgb_predictions = np.exp(xgb.predict(data=df_test[X.columns]))
-    xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
-    # wrap_and_submit(xgb_predictions, type(xgb).__name__)
-    sys.exit(0)
 
     # Random forests
     # Training, prediction and submission (optional, uncomment to use)
