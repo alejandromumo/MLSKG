@@ -4,7 +4,7 @@ import seaborn as sns
 import numpy as np
 from scipy.stats import norm
 from sklearn.preprocessing import StandardScaler
-from scipy import stats
+from scipy import stats, special
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -49,7 +49,6 @@ def transform_train_data(df_train):
     # Every house with basement, transform the squared feet to log
     df_train.loc[df_train['HasBsmt']==1,'TotalBsmtSF'] = np.log(df_train['TotalBsmtSF'])
     # convert categorical variable into dummy
-    # TODO try customized encoding
     new_df = pd.get_dummies(df_train)
     return new_df, returned_objects
 
@@ -183,25 +182,26 @@ def get_plots_and_analysis(df_train):
     plt.scatter(df_train[df_train['TotalBsmtSF']>0]['TotalBsmtSF'], df_train[df_train['TotalBsmtSF']>0]['SalePrice'])
 
 
-def my_analysis(df_train):
+def my_analysis(df_train, df_test):
     """
     TODO
     :param df_train:
     :return:
     """
     sns.set()
-    # fig = plt.figure()
-    # # sns.distplot(df_train["SalePrice"], fit=stats.johnsonsb, kde=False, fit_kws={'color': 'green'})
+    fig = plt.figure()
+    # sns.distplot(df_train["SalePrice"], fit=stats.johnsonsb, kde=False, fit_kws={'color': 'green'})
     # sns.distplot(df_train["SalePrice"], fit=stats.lognorm, kde=False, fit_kws={'color': 'blue'},
     #              axlabel="Sale Price Distribution (log fit)")
     # plt.show(block=False)
+    # print(df_train['SalePrice'].describe())
     # fig = plt.figure()
     # df_train["SalePrice"] = np.log(df_train["SalePrice"])
     # sns.distplot(df_train["SalePrice"], fit=stats.lognorm, kde=False, fit_kws={'color': 'blue'},
     #              axlabel="Log Sale Price Distribution")
     # plt.show()
     # input()
-    cols = ['OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt', 'Fireplaces']
+    # cols = ['OverallQual', 'GrLivArea', 'GarageCars', 'TotalBsmtSF', 'FullBath', 'YearBuilt', 'Fireplaces']
     # Distributions of selected features (fit=log)
     # for c in cols:
     #     fig = plt.figure()
@@ -230,11 +230,27 @@ def my_analysis(df_train):
     #     fig = plt.figure()
     #     sns.boxplot(x=c, y='SalePrice', data=pd.concat([df_train[c], df_train['SalePrice']], axis=1))
     #     plt.show(block=False)
-    # print("")
+    remove_outliers(df_train)
+    df_train.drop(axis=1, labels=['Id'], inplace=True)
+    deal_missing_data(df_train, df_test)
+    categorical_to_ordinal_features(df_train, df_test)
+    transform_numerical_features(df_train, df_test)
+    new_df_train, new_df_test = pd.get_dummies(df_train), pd.get_dummies(df_test)
+    if new_df_train.shape[1] != new_df_test.shape[1]:
+        train_features = new_df_train.columns
+        test_features = new_df_test.columns
+        features_to_add = np.setdiff1d(train_features.values, test_features.values)
+        features_to_add = np.delete(features_to_add, np.where(features_to_add == 'SalePrice'))
+        for feature in features_to_add:
+            new_df_test[feature] = 0
+        features_to_add = np.setdiff1d(test_features.values, train_features.values)
+        for feature in features_to_add:
+            new_df_train[feature] = 0
+    assert (new_df_train.isna().any().sum() == 0)
+    assert (new_df_test.isna().any().sum() == 0)
+    assert (new_df_train.shape[1] == new_df_test.shape[1]+1)
+    return new_df_train, new_df_test
 
-    #remove_outliers(df_train)
-    #deal_missing_data(df_train)
-    categorical_to_ordinal_features(df_train)
 
 def remove_outliers(df_train):
     """
@@ -249,7 +265,7 @@ def remove_outliers(df_train):
     df_train.drop(axis=0, labels=indexes, inplace=True)
 
 
-def deal_missing_data(df_train):
+def deal_missing_data(df_train, df_test):
     """
     Deals with missing data (NaN). Changes are made in place, does not return a new data frame.
     For categorical features:
@@ -265,27 +281,25 @@ def deal_missing_data(df_train):
     missing_data = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
     missing_data = missing_data[missing_data['Total'] > 0]
     # Fill rows that have missing data with the median value of the feature
-    cols = ['LotFrontage', 'MasVnrArea', 'GarageYrBlt']
-    for c in cols:
-        median = np.nanmedian(df_train[c])
-        df_train[c].fillna(median, inplace=True)
-        assert(df_train[c].isna().sum() == 0)
+    numerical_features = df_train.select_dtypes(exclude=object).columns
+    for c in numerical_features:
+        df_train[c].fillna(np.nanmedian(df_train[c]), inplace=True)
+        if c != 'SalePrice':
+            df_test[c].fillna(np.nanmedian(df_test[c]), inplace=True)
     # Fill rows that have missing data with specific values
     df_train['MasVnrType'].fillna('None', inplace=True)
     df_train['Electrical'].fillna('SBrkr', inplace=True)
     # Fill rows that have missing data with None or the median (numerical features)
-    cols = ['MiscFeature', 'Alley', 'Fence', 'FireplaceQu', 'GarageCond', 'GarageType', 'GarageFinish',
-            'GarageQual', 'BsmtExposure', 'BsmtFinType2', 'BsmtFinType1', 'BsmtCond', 'BsmtQual']
-    for c in cols:
-        if df_train.dtypes[c] == object:
-            df_train[c].fillna('None', inplace=True)
+    categorical_features = df_train.select_dtypes(include=object).columns
+    for c in categorical_features:
+        df_train[c].fillna('None', inplace=True)
+        df_test[c].fillna('None', inplace=True)
     # Drop PoolQC because almost 100% has no information regarding it.
     #   The feature PoolArea represents most of the feature PoolQC.
     df_train.drop(['PoolQC'], axis=1, inplace=True)
-    assert(df_train.isna().any().all() == False)
-    sns.boxplot(x='LandSlope', y='SalePrice', data=pd.concat([df_train['LandSlope'], df_train['SalePrice']], axis=1))
-    plt.show()
-    print()
+    df_test.drop(['PoolQC'], axis=1, inplace=True)
+    assert(df_train.isna().any().sum() == 0)
+    assert (df_test.isna().any().sum() == 0)
 
 
 def combine_features(df_train):
@@ -293,8 +307,12 @@ def combine_features(df_train):
     pass
 
 
-def categorical_to_ordinal_features(df_train):
-    # TODO
+def categorical_to_ordinal_features(df_train, df_test):
+    """
+    Transforms categorical features into ordinal. Selected features are based on manual analysis of data.
+    The transformation is made in place (i.e. does not return a new data frame).
+    :param df_train: Train data frame
+    """
     mapper = {'LotShape': {'Reg': 3, 'IR1': 2, 'IR2': 1, 'IR3': 0},
               'LandContour': {'Lvl': 1, 'Bnk': 0, 'HLS': 3, 'Low': 2},
               'LandSlope': {'Mod': 2, 'Gtl': 1, 'Sev': 0},
@@ -308,23 +326,48 @@ def categorical_to_ordinal_features(df_train):
               'HeatingQC': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
               'CentralAir': {'Y': 1, 'N': 0},
               'KitchenQual': {'Ex': 4, 'Gd': 3, 'TA': 2, 'Fa': 1, 'Po': 0},
+              'FireplaceQu': {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'None': 0},
+              'GarageFinish': {'Fin': 3, 'RFn': 2, 'Unf': 1, 'None': 0},
+              'GarageQual': {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'None': 0},
+              'GarageCond': {'Ex': 5, 'Gd': 4, 'TA': 3, 'Fa': 2, 'Po': 1, 'None': 0},
+              'Fence': {'GdPrv': 4, 'MnPrv': 3, 'GdWo': 2, 'MnWw': 1, 'None': 0}
               }
-    # Functional
-    # FireplaceQu
-    # GarageFinish
-    # GarageQual
-    # GarageCond
-    # Fence
     for k in list(mapper.keys()):
         df_train[k].replace(mapper.get(k), inplace=True)
-    print()
-    pass
+        df_test[k].replace(mapper.get(k), inplace=True)
+    assert(df_train.isna().any().all() == False)
+    assert(df_test.isna().any().all() == False)
 
 
-def transform_numerical_features(df_train):
-    # TODO
-    # apply log, scaling to features
-    pass
+def transform_numerical_features(df_train, df_test):
+    """
+    TODO currently deals with positive skewed features, not negative. Analyse this.
+    :param df_train:
+    :param df_test:
+    :return:
+    """
+    # apply log, scaling features
+    # SalePrice. Check log against log(1+x), log1p
+    df_train['SalePrice'] = np.log1p(df_train['SalePrice'])
+    # Check for skewed features
+    features_skewness = []
+    for k in df_train.columns:
+        if k == 'SalePrice':
+            pass
+        elif df_train.dtypes[k] != object:
+            features_skewness.append([k, np.float(stats.skew(df_train[k]))])
+    features_skewness_df = pd.DataFrame(features_skewness, columns=['F', 'S']).sort_values(by='S')
+    left_skewed_features = features_skewness_df[features_skewness_df['S'] > 0.5]['F']
+    right_skewed_features = features_skewness_df[features_skewness_df['S'] < -0.5]['F']
+    # Apply log for right-skewed features (skewness<-0.5)
+    # Apply boxcox1p for left-skewed features (skewness>0.5)
+    #     boxcox1p(x,lmbda):
+    #       y = log(1+x) if lmbda==0
+    #       y = ((1+x)**lmbda - 1) / lmbda  if lmbda != 0
+    # the Box-Cox Power transformation only works if all the data is positive and greater than 0
+    for f in left_skewed_features:
+        df_train[f] = special.boxcox1p(df_train[f], stats.boxcox_normmax(df_train[f] + 1))
+        df_test[f] = special.boxcox1p(df_test[f], stats.boxcox_normmax(df_test[f] + 1))
 
 '''
 Notes about data:
