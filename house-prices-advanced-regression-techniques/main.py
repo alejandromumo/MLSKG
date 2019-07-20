@@ -438,33 +438,40 @@ if __name__ == '__main__':
     """
     # Train data set
     df_train = load_data_set("train_houses.csv")
+    df_test = load_data_set("test.csv")
     # Transform data set based on kaggle forums
-    my_analysis(df_train)
-    df_train, transformations = transform_train_data(df_train)
+    df_train, df_test = my_analysis(df_train, df_test)
+    #df_train, transformations = transform_train_data(df_train)
     X = df_train.drop('SalePrice', axis=1)
     y = df_train['SalePrice']
     # Test data set
-    df_test = load_data_set("test.csv")
     # Transform data set, inversely on what was done previously
-    df_test = transform_test_data(df_test, transformations[0], df_train.columns)
+    # df_test = transform_test_data(df_test, transformations[0], df_train.columns)
     """
     Train models.
     Note: When making the predictions, np.exp() is used on the predictions given by models.
     This is due to performing np.log() on the target while transforming the training and test data.
     """
-    sys.exit(0)
     # XGB
     # XGB hyper parameter tuning
     # xgb_hp_tuning(X, y)
     # training, prediction and submission
     xgb_model = train_xgb(X, y, False)
-    best_i = np.argpartition(xgb_model.feature_importances_, -5)[-5:]
-    features = [(df_train.columns[i], xgb_model.feature_importances_[i]) for i in best_i]
-    for f in features:
-        print(f)
-    xgb_predictions = np.exp(xgb_model.predict(data=df_test[X.columns]))
+    xgb_predictions = np.expm1(xgb_model.predict(data=df_test[X.columns]))
     xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
-    # wrap_and_submit(xgb_predictions, type(xgb_model).__name__)
+    wrap_and_submit(xgb_predictions, type(xgb_model).__name__)
+    sys.exit(0)
+    # Lasso
+    # Lasso hyper parameter tuning
+    # lasso_alpha_tuning(X, y, False)
+    # Training, prediction and submission (optional, uncomment to use)
+    alphas = [0.01]
+    for alpha in alphas:
+        lasso = train_lasso(X, y, plot=False, alpha=alpha)
+        lasso_predictions = np.expm1(lasso.predict(X=df_test))
+        lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
+        wrap_and_submit(lasso_predictions, "lasso regression with alpha: " + str(lasso.alpha))
+
     # Ridge
     # Ridge hyper parameter tuning
     # ridge_alpha_tuning(X, y, False)
@@ -475,17 +482,6 @@ if __name__ == '__main__':
         ridge_predictions = np.exp(ridge.predict(X=df_test))
         ridge_predictions = pd.DataFrame(ridge_predictions, columns=["SalePrice"])
         # wrap_and_submit(ridge_predictions, "ridge regression with alpha: " + str(ridge.alpha))
-
-    # Lasso
-    # Lasso hyper parameter tuning
-    # lasso_alpha_tuning(X, y, False)
-    # Training, prediction and submission (optional, uncomment to use)
-    alphas = [0.01, 1]
-    for alpha in alphas:
-        lasso = train_lasso(X, y, plot=False, alpha=alpha)
-        lasso_predictions = np.exp(lasso.predict(X=df_test))
-        lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
-        # wrap_and_submit(lasso_predictions, "lasso regression with alpha: " + str(lasso.alpha))
 
     # Linear
     # Training, prediction and submission (optional, uncomment to use)
