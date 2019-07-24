@@ -219,19 +219,21 @@ def xgb_hp_tuning(X, y):
     :param X: X of the current dataset
     :param y: target of the current dataset
     """
-    max_depth = [int(x) for x in np.arange(start=10, stop=100, step=20)]
-    min_child_weight = [int(x) for x in np.arange(start=1, stop=4, step=1)]
-    gamma = [int(x) for x in np.arange(start=0, stop=0.3, step=0.1)]
-    n_estimators = [int(x) for x in np.arange(start=100, stop=1000, step=10)]
+    max_depth = [int(x) for x in np.arange(start=1, stop=10, step=2)]
+    min_child_weight = [int(x) for x in np.arange(start=1, stop=10, step=2)]
+    gamma = [x for x in np.arange(start=0, stop=0.5, step=0.1)]
+    n_estimators = [int(x) for x in np.arange(start=100, stop=3000, step=100)]
+    learning_rate = [x for x in np.arange(start=0.01, stop=0.1, step=0.01)]
     grid = {'max_depth': max_depth,
-                   'min_child_weight': min_child_weight,
-                   'gamma': gamma,
-                   'n_estimators': n_estimators}
+            'min_child_weight': min_child_weight,
+            'gamma': gamma,
+            'n_estimators': n_estimators,
+            'learning_rate': learning_rate}
     xgb_model = xgb.XGBRegressor(n_jobs=-1)
-    # grid_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=grid, n_iter=100, cv=3, verbose=2,
-    #                                  random_state=42, scoring='neg_mean_squared_error', n_jobs=1)
-    grid_search = GridSearchCV(estimator=xgb_model, param_grid=grid, cv=3, verbose=2, scoring='neg_mean_squared_error',
-                               n_jobs=1)
+    grid_search = RandomizedSearchCV(estimator=xgb_model, param_distributions=grid, n_iter=100, cv=5, verbose=2,
+                                     random_state=42, scoring='neg_mean_squared_error', n_jobs=1)
+    # grid_search = GridSearchCV(estimator=xgb_model, param_grid=grid, cv=3, verbose=2, scoring='neg_mean_squared_error',
+    #                           n_jobs=1)
     grid_search.fit(X, y)
     print(grid_search.best_params_)
     print(grid_search.best_score_)
@@ -265,6 +267,14 @@ def xgb_hp_tuning(X, y):
     # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 130}, -0.01649072406422703
     # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 110}, -0.016452422168526753
     # {'gamma': 0, 'max_depth': 10, 'min_child_weight': 3, 'n_estimators': 100}, -0.01639837965635243
+    # Using new data:
+    # {'n_estimators': 180, 'min_child_weight': 2, 'max_depth': 10, 'gamma': 0}, -0.014972665473360368
+    # {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0}, -0.013471785428194584
+    # {'n_estimators': 2700, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.04, 'gamma': 0.0}, -0.01402197351780234
+    # {'n_estimators': 1600, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0}, -0.013662255625430351
+    # {'n_estimators': 1900, 'min_child_weight': 5, 'max_depth': 1, 'learning_rate': 0.06999999999999999, 'gamma': 0.0}, -0.013505285149724003
+    # {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0}, -0.013848513602727196
+    # {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0}, -0.013471785428194584
 
 
 def get_df_parameter(index, combinations_param, scores):
@@ -338,7 +348,7 @@ def train_svr(X, y, plot=False, linear=False):
     return model
 
 
-def train_xgb(X, y, plot=False):
+def train_xgb(X, y, plot=False, param_dist=None):
     """
     Trains a boosted tree regressor using the XGBoost library (https://xgboost.readthedocs.io/en/).
     :param X: X of the current dataset
@@ -346,13 +356,14 @@ def train_xgb(X, y, plot=False):
     :param plot: either true or false. Controls if plots are shown while training this model.
     :return: trained extreme boosted tree model
     """
-    param_dist = {'gamma': 0,
-                  'max_depth': 10,
-                  'min_child_weight': 3,
-                  'n_estimators': 100,
-                  'n_jobs': -1,
-                  'subsample': 0.6,
-                  'colsample_bytree': 0.6}
+    if param_dist is None:
+        param_dist = {'gamma': 0,
+                      'max_depth': 10,
+                      'min_child_weight': 2,
+                      'n_estimators': 180,
+                      'n_jobs': -1,
+                      'subsample': 0.6,
+                      'colsample_bytree': 0.6}
 
     estimator = xgb.XGBRegressor(**param_dist)
     model_name = type(estimator).__name__
@@ -452,14 +463,25 @@ if __name__ == '__main__':
     Note: When making the predictions, np.exp() is used on the predictions given by models.
     This is due to performing np.log() on the target while transforming the training and test data.
     """
+    # TODO check over fitting
     # XGB
     # XGB hyper parameter tuning
     # xgb_hp_tuning(X, y)
     # training, prediction and submission
-    xgb_model = train_xgb(X, y, False)
-    xgb_predictions = np.expm1(xgb_model.predict(data=df_test[X.columns]))
-    xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
-    wrap_and_submit(xgb_predictions, type(xgb_model).__name__)
+    params = [
+        {'n_estimators': 2700, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.04, 'gamma': 0.0},
+        {'n_estimators': 1600, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0},
+        {'n_estimators': 1900, 'min_child_weight': 5, 'max_depth': 1, 'learning_rate': 0.06999999999999999, 'gamma': 0.0},
+        {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0},
+        {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0},
+    ]
+    for param_dist in params:
+        xgb_model = train_xgb(X, y, False, param_dist)
+    # idx = np.argpartition(xgb_model.feature_importances_, -5)[-5:]
+    # tmp = np.stack((np.array(df_train.columns[idx]), xgb_model.feature_importances_[idx]), axis=1)
+        xgb_predictions = np.expm1(xgb_model.predict(data=df_test[X.columns]))
+        xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
+        wrap_and_submit(xgb_predictions, "{}: {}".format(type(xgb_model).__name__, param_dist))
     sys.exit(0)
     # Lasso
     # Lasso hyper parameter tuning
