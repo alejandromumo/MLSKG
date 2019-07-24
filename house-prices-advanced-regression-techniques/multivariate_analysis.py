@@ -220,22 +220,23 @@ def my_analysis(df_train, df_test):
     # plt.show()
     # input()
     # cols_scatter = ['GrLivArea', 'TotalBsmtSF', 'YearBuilt']
-    # for c in cols_scatter:
-    #     fig = plt.figure()
-    #     sns.scatterplot(x=c, y='SalePrice', data=pd.concat([df_train[c], df_train['SalePrice']], axis=1))
-    #     plt.show(block=False)
     # # Boxplot of selected features
-    # cols_box_plot = ['OverallQual', 'GarageCars', 'FullBath', 'Fireplaces']
+    # cols_box_plot = ['OverallQual', 'GarageCars', 'FullBath', 'Fireplaces', 'Utilities', 'Street']
     # for c in cols_box_plot:
     #     fig = plt.figure()
     #     sns.boxplot(x=c, y='SalePrice', data=pd.concat([df_train[c], df_train['SalePrice']], axis=1))
     #     plt.show(block=False)
+    features = classify_features(df_train)
+    numerical_features = features[0]
+    categorical_features = features[1]
     remove_outliers(df_train)
     df_train.drop(axis=1, labels=['Id'], inplace=True)
     deal_missing_data(df_train, df_test)
     categorical_to_ordinal_features(df_train, df_test)
     transform_numerical_features(df_train, df_test)
+    combine_features(df_train, df_test)
     new_df_train, new_df_test = pd.get_dummies(df_train), pd.get_dummies(df_test)
+    # Compensate both data frames for creating dummies. Creates columns in train and test that are missing.
     if new_df_train.shape[1] != new_df_test.shape[1]:
         train_features = new_df_train.columns
         test_features = new_df_test.columns
@@ -296,15 +297,32 @@ def deal_missing_data(df_train, df_test):
         df_test[c].fillna('None', inplace=True)
     # Drop PoolQC because almost 100% has no information regarding it.
     #   The feature PoolArea represents most of the feature PoolQC.
-    df_train.drop(['PoolQC'], axis=1, inplace=True)
-    df_test.drop(['PoolQC'], axis=1, inplace=True)
+    features_to_drop = ['PoolQC', 'Street', 'Utilities']
+    df_train.drop(features_to_drop, axis=1, inplace=True)
+    df_test.drop(features_to_drop, axis=1, inplace=True)
     assert(df_train.isna().any().sum() == 0)
     assert (df_test.isna().any().sum() == 0)
 
 
-def combine_features(df_train):
-    # TODO
-    pass
+def classify_features(df_train):
+    numerical_features = []
+    categorical_features = []
+    for c in df_train:
+        if df_train.dtypes[c] != object:
+            numerical_features.append(c)
+        else:
+            categorical_features.append(c)
+    return numerical_features, categorical_features
+
+
+def combine_features(df_train, df_test):
+    ds = [df_train, df_test]
+    for d in ds:
+        d['TotalSF'] = d['TotalBsmtSF'] + d['1stFlrSF'] + d['2ndFlrSF']
+        d['Total_porch_sf'] = (d['OpenPorchSF'] + d['3SsnPorch'] +
+                                      d['EnclosedPorch'] + d['ScreenPorch'] +
+                                      d['WoodDeckSF'])
+        d['haspool'] = d['PoolArea'].apply(lambda x: 1 if x > 0 else 0)
 
 
 def categorical_to_ordinal_features(df_train, df_test):
