@@ -384,8 +384,9 @@ def transform_numerical_features(df_train, df_test):
     #       y = ((1+x)**lmbda - 1) / lmbda  if lmbda != 0
     # the Box-Cox Power transformation only works if all the data is positive and greater than 0
     for f in left_skewed_features:
-        df_train[f] = special.boxcox1p(df_train[f], stats.boxcox_normmax(df_train[f] + 1))
-        df_test[f] = special.boxcox1p(df_test[f], stats.boxcox_normmax(df_test[f] + 1))
+        box_cox_coef = stats.boxcox_normmax(df_train[f] + 1)
+        df_train[f] = special.boxcox1p(df_train[f], box_cox_coef)
+        df_test[f] = special.boxcox1p(df_test[f], box_cox_coef)
 
 '''
 Notes about data:
