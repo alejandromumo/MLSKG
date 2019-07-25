@@ -26,7 +26,7 @@ def lasso_alpha_tuning(X, y, plot=True):
     :param plot: either true or false. Controls if plots are shown while training models.
     """
     print("Tuning Lasso Model Alpha")
-    alphas = [0.1, 0.01, 0.001, 0.0005]
+    alphas = [5e-05, 0.0001, 0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008]
     k = 10
     kf = KFold(n_splits=k)
     e = list()
@@ -41,6 +41,16 @@ def lasso_alpha_tuning(X, y, plot=True):
             e.append(rmse)
     splits = np.split(np.array(e), len(alphas))
     errors = np.column_stack(splits)
+    best_idx = np.argpartition(np.mean(errors, axis=0), -5)[-5:]
+    for i in best_idx:
+        print(alphas[i])
+        # 0.0006
+        # 5e-05
+        # 0.0002
+        # 0.0007
+        # 0.0008
+        # 0.0001
+        # 5e-05
     if plot:
         means = np.mean(errors, axis=0)
         mins = np.min(errors, axis=0)
@@ -83,7 +93,7 @@ def ridge_alpha_tuning(X, y, plot=False):
     :param plot: either true or false. Controls if plots are shown while training models.
     """
     print("Tuning Ridge Model Alpha")
-    alphas = [0.05, 0.1, 0.3, 1, 3, 5, 10, 15, 30, 50, 75]
+    alphas = [14.5, 14.6, 14.7, 14.8, 14.9, 15, 15.1, 15.2, 15.3, 15.4, 15.5]
     k = 10
     kf = KFold(n_splits=k)
     e = list()
@@ -276,6 +286,12 @@ def xgb_hp_tuning(X, y):
     # {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0}, -0.013848513602727196
     # {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0}, -0.013471785428194584
 
+    # {'n_estimators': 2700, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.04, 'gamma': 0.0},-0.01402197351780234
+    # {'n_estimators': 1600, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0},-0.013662255625430351
+    # {'n_estimators': 1900, 'min_child_weight': 5, 'max_depth': 1, 'learning_rate': 0.06999999999999999, 'gamma': 0.0},-0.013505285149724003
+    # {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0},-0.013848513602727196
+    # {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0},-0.013471785428194584
+
 
 def get_df_parameter(index, combinations_param, scores):
     result = list()
@@ -379,14 +395,14 @@ def train_xgb(X, y, plot=False, param_dist=None):
     return model
 
 
-def wrap_and_submit(predictions, message):
+def wrap_and_submit(predictions, test_id, message):
     """
     Perform a submission to the kaggle competition with the given predictions and message
     :param predictions: predicted target values to be evaluated
     :param message: message for the submission
     :return:
     """
-    submission = pd.DataFrame(pd.concat([df_test["Id"], predictions], axis=1), columns=["Id", "SalePrice"])
+    submission = pd.DataFrame(pd.concat([test_id, predictions], axis=1), columns=["Id", "SalePrice"])
     submission.to_csv(basedir + "submission.csv", sep=",", header=True, index=False)
     os.system(command + "\"" + message + "\"")
 
@@ -451,7 +467,9 @@ if __name__ == '__main__':
     df_train = load_data_set("train_houses.csv")
     df_test = load_data_set("test.csv")
     # Transform data set based on kaggle forums
-    df_train, df_test = my_analysis(df_train, df_test)
+    test_id = df_test['Id']
+    df_test.drop(axis=1, labels=['Id'], inplace=True)
+    df_train, df_test  = my_analysis(df_train, df_test)
     #df_train, transformations = transform_train_data(df_train)
     X = df_train.drop('SalePrice', axis=1)
     y = df_train['SalePrice']
@@ -463,45 +481,47 @@ if __name__ == '__main__':
     Note: When making the predictions, np.exp() is used on the predictions given by models.
     This is due to performing np.log() on the target while transforming the training and test data.
     """
-    # TODO check over fitting
     # XGB
     # XGB hyper parameter tuning
     # xgb_hp_tuning(X, y)
     # training, prediction and submission
+    # TODO check over fitting, random state
     params = [
-        {'n_estimators': 2700, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.04, 'gamma': 0.0},
-        {'n_estimators': 1600, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0},
-        {'n_estimators': 1900, 'min_child_weight': 5, 'max_depth': 1, 'learning_rate': 0.06999999999999999, 'gamma': 0.0},
-        {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0},
-        {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0},
+        # {'n_estimators': 2700, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0,
+        # 'colsample_by_tree': 0.6, 'subsample': 0.6, 'random_state': 42},
+        # {'n_estimators': 1600, 'min_child_weight': 3, 'max_depth': 3, 'learning_rate': 0.01, 'gamma': 0.0},
+        # {'n_estimators': 1900, 'min_child_weight': 5, 'max_depth': 1, 'learning_rate': 0.06999999999999999, 'gamma': 0.0},
+        # {'n_estimators': 500, 'min_child_weight': 7, 'max_depth': 3, 'learning_rate': 0.08, 'gamma': 0.0},
+        {'n_estimators': 1900, 'min_child_weight': 7, 'max_depth': 1, 'learning_rate': 0.05, 'gamma': 0.0,
+         'colsample_by_tree': 0.6, 'subsample': 0.6, 'random_state': 42},
     ]
     for param_dist in params:
         xgb_model = train_xgb(X, y, False, param_dist)
-    # idx = np.argpartition(xgb_model.feature_importances_, -5)[-5:]
-    # tmp = np.stack((np.array(df_train.columns[idx]), xgb_model.feature_importances_[idx]), axis=1)
         xgb_predictions = np.expm1(xgb_model.predict(data=df_test[X.columns]))
         xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
-        wrap_and_submit(xgb_predictions, "{}: {}".format(type(xgb_model).__name__, param_dist))
+        wrap_and_submit(xgb_predictions, test_id, "{}: {}".format(type(xgb_model).__name__, param_dist))
     sys.exit(0)
+
     # Lasso
     # Lasso hyper parameter tuning
     # lasso_alpha_tuning(X, y, False)
     # Training, prediction and submission (optional, uncomment to use)
-    alphas = [0.01]
+    alphas = [0.0006, 5e-05, 0.0002, 0.0007, 0.0008, 0.0001, 5e-05]
     for alpha in alphas:
         lasso = train_lasso(X, y, plot=False, alpha=alpha)
+        # Use expm1 on submission's SalePrice because log1p was applied before
         lasso_predictions = np.expm1(lasso.predict(X=df_test))
         lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
-        wrap_and_submit(lasso_predictions, "lasso regression with alpha: " + str(lasso.alpha))
-
+        wrap_and_submit(lasso_predictions, test_id, "lasso regression with alpha: " + str(lasso.alpha))
+    sys.exit(0)
     # Ridge
     # Ridge hyper parameter tuning
     # ridge_alpha_tuning(X, y, False)
     # training, prediction and submission (optional, uncomment to use)
-    alphas = [1, 5, 10, 15]
+    alphas = [15.1, 14.5, 15.4, 14.8, 14.9]
     for alpha in alphas:
         ridge = train_ridge(X, y, plot=False, alpha=alpha)
-        ridge_predictions = np.exp(ridge.predict(X=df_test))
+        ridge_predictions = np.expm1(ridge.predict(X=df_test))
         ridge_predictions = pd.DataFrame(ridge_predictions, columns=["SalePrice"])
         # wrap_and_submit(ridge_predictions, "ridge regression with alpha: " + str(ridge.alpha))
 
