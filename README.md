@@ -88,13 +88,14 @@ Moreover, the train data set is unbalanced (8.95:1). Both the classification alg
 Hyper-parameters were determined using cross-validation (10-fold). 
 
 - Support Vector Machines
-Hyper-parameters were determined by cross-validation using sub-sampling due to the data set's size.
+Hyper-parameters were determined by cross-validation using sub-sampling due to the data set's size. 
+Three models were tested using rbf kernel.
 
-* (1.5% of the data was used to find the best hyper-parameters, 3-fold) 
+* Model #2 (1.5% of the data was used to find the best hyper-parameters, 3-fold) 
 
-* (2.5% of the data was used to find the best hyper-parameters, 10-fold) 
+* Model #4 (2.5% of the data was used to find the best hyper-parameters, 10-fold) 
 
-* (0.25% of the data was used to find the best hyper-parameters, 10-fold) 
+* Model #1 (0.25% of the data was used to find the best hyper-parameters, 10-fold) 
   
 
 ### Results
