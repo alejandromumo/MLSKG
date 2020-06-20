@@ -31,7 +31,7 @@ Data pre-processing is made using [Pedro Marcelino's ](http://pmarcelino.com/) a
   * Support Vector Regressor (SVR)
   * Linear SVR
 - Boosting
-  * in progress
+  * Extreme Gradient Boosted Trees
 ### Results
 | Model  | Estimated test error | Training rmse | Real score | #  | Notes                                                                                                                      |
 |--------|----------------------|---------------|------------|----|----------------------------------------------------------------------------------------------------------------------------|
@@ -62,4 +62,48 @@ Data pre-processing is made using [Pedro Marcelino's ](http://pmarcelino.com/) a
 - Some models were briefly analysed such as Support Vector Machines and Extra trees. Their hyper-parameters combinations were not deeply explored and there is work to be done in that aspect.
 - Data is "dummy" encoded (a.k.a. one-hot encoded) by default using panda's method ```get_dummies()``` [(doc)](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.get_dummies.html). Further analysis allows data to be encoded manually. The file *data_description.txt* already contains some data analysis that separates categorical data into ordinal and nominal but it is not implemented yet.
 ## Classification
+The competition's challenge is to classify bank transactions to detect fraudulent ones. It is a binary classification problem where models are expected to classify bank transactions in one of the two existing classes: fraud and legitimate. The data set contains more than 100k transactions where each one is characterized by 400 encoded, numerical columns.
 
+The main focuses of this challenge are: 
+
+- Data exploration on big data sets. 
+
+- Train classification models using hyper-parameter tuning. 
+
+### Work Description 
+One of the main challenges from this assignment is its dataset's size. Algorithms that have higher complexity (like SVM with rbf kernel) are slow on this data especially when we the tuning of its hyper-parameters is performed with cross-validation. Sub-sampling is an alternative approach implemented to tackle this. 
+
+Moreover, the train data set is unbalanced (8.95:1). Both the classification algorithms and the score metrics take the unbalance into account (i.e. error scores are weighted).
+
+
+### Models
+- LDA (Linear Discriminant Analysis): 
+
+    * Linear with default settings 
+
+    * Quadratic with default settings 
+- Logistic Regression:
+    
+    * Logistic Regressor with regularization factor of 1.0000000000000005e-09. 
+Hyper-parameters were determined using cross-validation (10-fold). 
+
+- Support Vector Machines
+Hyper-parameters were determined by cross-validation using sub-sampling due to the data set's size.
+
+* (1.5% of the data was used to find the best hyper-parameters, 3-fold) 
+
+* (2.5% of the data was used to find the best hyper-parameters, 10-fold) 
+
+* (0.25% of the data was used to find the best hyper-parameters, 10-fold) 
+  
+
+### Results
+
+|   Model   |    AUC   | #  |                                Notes                                 |
+|:---------:|:--------:|:--:|:--------------------------------------------------------------------:|
+| SVM       | 0.77907  | 1  | rbf kernel, C=512 gamma=0.0001220703125.  Sub-sampling (0.025)       |
+| SVM       | 0.77873  | 2  | rbf kernel, C=1024 gamma=0.0001220703125. Sub sampling data (0.015)  |
+| Logistic  | 0.5241   | 3  | penalty="l2", max_iter=500, C= 1.0000000000000005e-09                |
+| SVM       | 0.77916  | 4  | C=8192, gamma=3.0517578125e-05, Sub-sampling (0.0025)                |
+| LDA       | 0.63557  | 5  | Default                                                              |
+| QDA       | 0.64633  | 6  | Default                                                              |
