@@ -374,12 +374,13 @@ def train_xgb(X, y, plot=False, param_dist=None):
     """
     if param_dist is None:
         param_dist = {'gamma': 0,
-                      'max_depth': 10,
+                      'max_depth': 1,
                       'min_child_weight': 2,
                       'n_estimators': 180,
                       'n_jobs': -1,
                       'subsample': 0.6,
-                      'colsample_bytree': 0.6}
+                      'colsample_bytree': 0.6,
+                      'learning_rate': 0.05}
 
     estimator = xgb.XGBRegressor(**param_dist)
     model_name = type(estimator).__name__
@@ -393,6 +394,16 @@ def train_xgb(X, y, plot=False, param_dist=None):
     if plot:
         plot_residuals(y_pred, y, model_name)
     return model
+
+
+def train_meta_model(estimators, weights):
+    """
+    TODO check for stacked cv etc
+    :param estimators:
+    :param weights:
+    :return:
+    """
+    pass
 
 
 def wrap_and_submit(predictions, test_id, message):
@@ -470,7 +481,7 @@ if __name__ == '__main__':
     test_id = df_test['Id']
     df_test.drop(axis=1, labels=['Id'], inplace=True)
     df_train, df_test  = my_analysis(df_train, df_test)
-    #df_train, transformations = transform_train_data(df_train)
+    # df_train, transformations = transform_train_data(df_train)
     X = df_train.drop('SalePrice', axis=1)
     y = df_train['SalePrice']
     # Test data set
@@ -481,6 +492,17 @@ if __name__ == '__main__':
     Note: When making the predictions, np.exp() is used on the predictions given by models.
     This is due to performing np.log() on the target while transforming the training and test data.
     """
+    # Lasso
+    # Lasso hyper parameter tuning
+    # lasso_alpha_tuning(X, y, False)
+    # Training, prediction and submission (optional, uncomment to use)
+    alphas = [0.01]
+    for alpha in alphas:
+        lasso = train_lasso(X, y, plot=False, alpha=alpha)
+        # Use expm1 on submission's SalePrice because log1p was applied before
+        lasso_predictions = np.expm1(lasso.predict(X=df_test))
+        lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
+        # wrap_and_submit(lasso_predictions, test_id, "lasso regression with alpha: " + str(lasso.alpha))
     # XGB
     # XGB hyper parameter tuning
     # xgb_hp_tuning(X, y)
@@ -499,21 +521,13 @@ if __name__ == '__main__':
         xgb_model = train_xgb(X, y, False, param_dist)
         xgb_predictions = np.expm1(xgb_model.predict(data=df_test[X.columns]))
         xgb_predictions = pd.DataFrame(xgb_predictions, columns=["SalePrice"])
-        wrap_and_submit(xgb_predictions, test_id, "{}: {}".format(type(xgb_model).__name__, param_dist))
+#        wrap_and_submit(xgb_predictions, test_id, "{}: {}".format(type(xgb_model).__name__, param_dist))
+    tmp1 = xgb_predictions.apply(lambda x: x * 0.70)
+    tmp2 = lasso_predictions.apply(lambda x: x * 0.30)
+    final_predictions = tmp1.add(tmp2, fill_value=0)
+    wrap_and_submit(final_predictions, test_id, "Meta model using best lasso and xgb scores".format())
     sys.exit(0)
 
-    # Lasso
-    # Lasso hyper parameter tuning
-    # lasso_alpha_tuning(X, y, False)
-    # Training, prediction and submission (optional, uncomment to use)
-    alphas = [0.0006, 5e-05, 0.0002, 0.0007, 0.0008, 0.0001, 5e-05]
-    for alpha in alphas:
-        lasso = train_lasso(X, y, plot=False, alpha=alpha)
-        # Use expm1 on submission's SalePrice because log1p was applied before
-        lasso_predictions = np.expm1(lasso.predict(X=df_test))
-        lasso_predictions = pd.DataFrame(lasso_predictions, columns=["SalePrice"])
-        wrap_and_submit(lasso_predictions, test_id, "lasso regression with alpha: " + str(lasso.alpha))
-    sys.exit(0)
     # Ridge
     # Ridge hyper parameter tuning
     # ridge_alpha_tuning(X, y, False)
